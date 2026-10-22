@@ -5,6 +5,8 @@
 
 ---
 
+**Auditstand · 22.10.2026:** Haken beruhen auf dem vorhandenen Code bzw. den ausgeführten Prüfungen. Der frühere `kat-create`-Aufruf sowie Serverstart und Browserdarstellung sind in diesem Audit nicht belegt; die entsprechenden Haken wurden als ungeprüft geöffnet, nicht als widerlegt bewertet. Zod ist installiert. Schema und abgeleiteter Typ sind vorhanden; die Behandlung fehlender Bildfelder und leerer Angaben bleibt offen (Details im FR-Review in `PROJECT_REQUIREMENTS.md`). Typcheck ohne Dateiausgabe und Lint bestehen. Produktions-Build und Browserprüfung bleiben ungeprüft. Der Anforderungsabgleich ist durchgeführt; die fachlichen Funktionen sind dadurch noch nicht fertig.
+
 ## 🧭 BUILD ROUTE
 
 - [STAGE 01 · Projekt vorbereiten](#stage-01--projekt-vorbereiten)
@@ -25,10 +27,10 @@ Die React-/TypeScript-Anwendung läuft lokal und Zod ist installiert.
 
 ### 1 · Projektgerüst prüfen (FR001)
 
-- [x] Artelier mit `kat-create` anlegen.
+- [ ] Artelier mit `kat-create` anlegen.
 - [x] Vite mit React und TypeScript im Projekt einrichten.
 - [x] Abhängigkeiten installieren.
-- [x] Entwicklungsserver starten und Anwendung im Browser prüfen.
+- [ ] Entwicklungsserver starten und Anwendung im Browser prüfen.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -44,8 +46,8 @@ npm run dev
 
 ### 2 · Zod installieren (FR002)
 
-- [ ] Zod als Abhängigkeit installieren.
-- [ ] Prüfen, ob Zod in `package.json` steht.
+- [x] Zod als Abhängigkeit installieren.
+- [x] Prüfen, ob Zod in `package.json` steht.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -59,8 +61,8 @@ Installiert Zod, damit eingehende Daten zur Laufzeit überprüft werden können.
 
 ## ✅ FERTIG, WENN
 
-- [x] Die Vite-/React-App im Browser läuft.
-- [ ] Zod installiert ist.
+- [ ] Die Vite-/React-App im Browser läuft.
+- [x] Zod installiert ist.
 
 ---
 
@@ -79,9 +81,9 @@ Kunstwerkdaten von der API abrufen und mit Zod validieren.
 
 ### 2 · ArtworkSchema definieren (FR003, FR012)
 
-- [ ] Ein Zod-Schema für `id`, `title`, `artist_title` und `image_id` erstellen.
+- [x] Ein Zod-Schema für `id`, `title`, `artist_title` und `image_id` erstellen.
 - [ ] Sinnvolle Behandlung fehlender oder leerer Angaben festlegen.
-- [ ] Den TypeScript-Typ aus dem Schema ableiten.
+- [x] Den TypeScript-Typ aus dem Schema ableiten.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -169,7 +171,7 @@ if (result.success) {
 ## ✅ FERTIG, WENN
 
 - [ ] Das Schema die benötigten Felder korrekt beschreibt.
-- [ ] Der Artwork-Typ aus Zod abgeleitet wird.
+- [x] Der Artwork-Typ aus Zod abgeleitet wird.
 - [ ] API-Daten abgerufen und vor der Verwendung validiert werden.
 
 ---
@@ -462,10 +464,10 @@ const gefiltert = eintraege.filter((eintrag) => eintrag.id !== id);
 
 ### 3 · Abschlussprüfung (FR001–FR012)
 
-- [ ] Alle zwölf Functional Requirements gegen die Aufgabenstellung prüfen.
+- [x] Alle zwölf Functional Requirements gegen die Aufgabenstellung prüfen.
 - [ ] Suche, Favoriten, Notizen und Löschen testen.
 - [ ] Seiten-Neuladen und fehlende API-Daten testen.
-- [ ] Typ- und Lintermeldungen prüfen.
+- [x] Typ- und Lintermeldungen prüfen.
 - [ ] Die Anwendung für die Präsentation vorbereiten.
 
 #### 🧱 DAFÜR BRAUCHST DU
