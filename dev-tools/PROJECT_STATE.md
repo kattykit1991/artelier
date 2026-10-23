@@ -15,8 +15,8 @@ Das aktuelle Ziel / die aktuelle Stage.
 Nicht die komplette Projektvision – dafür gibt es PROJECT_START.md.
 -->
 
-- **Checkpoint: 22.10.2026 · Stage 02 – Datenmodell und API.**
-- Das Artwork-Datenmodell anhand echter API-Daten absichern und anschließend den validierten API-Abruf selbst umsetzen.
+- **Checkpoint: 23.10.2026 · Stage 02 – Datenmodell und API.**
+- FR004 schrittweise fertigstellen. FR003 ist erfolgreich geprüft und abgeschlossen.
 
 ---
 
@@ -32,11 +32,11 @@ Konkrete technische Details nur dann hier festhalten, wenn sie für das Verstän
 des aktuellen Zustands wirklich wichtig sind.
 -->
 
-- Heute erreicht: Zod als Abhängigkeit ergänzt (Manifest und Lockfile); `ArtworkSchema` und der abgeleitete, exportierte Typ `Artwork` in `src/schemas/artworkSchema.ts` erstellt. Die Oberfläche ist weiterhin das Vite-Startergerüst.
-- Unabhängiger Codex-Audit vom 22.10.2026 abgeschlossen; Requirements-Status und Build-Guide-Haken mit dem tatsächlichen Code abgeglichen.
-- **Implementierung:** FR001–FR002 umgesetzt; FR003 und FR012 teilweise umgesetzt, ausdrücklich noch nicht abgeschlossen; FR004–FR011 noch offen. Details und separate Reviewstatus stehen in `PROJECT_REQUIREMENTS.md`.
-- **Audit-Ergebnisse:** Lint, beide TypeScript-Prüfungen ohne Dateiausgabe und lokaler Abhängigkeitsabgleich bestanden. Synthetische Laufzeitstichproben bestätigen Schema-Verhalten und Ersatztexte.
-- **Ungeprüft:** Browserdarstellung, Produktions-Build, tatsächliche API-Antworten und Browserpersistenz. Die bestandenen Typprüfungen ersetzen diese Prüfungen nicht.
+- Heute: FR003 nachgeprüft und mit PASS abgeschlossen; fehlende oder `null` gesetzte Bild-IDs werden zu `null` normalisiert. Die 14 Schema-Laufzeitfälle und die Typinferenzprüfung sind im Requirements-Dokument festgehalten.
+- `src/services/artworkServices.ts` enthält die asynchrone Funktion `artworkSearch(query: string)`: dynamischer Suchbegriff mit `encodeURIComponent`, Fetch, HTTP-Prüfung mit `response.ok` und `throw new Error`, JSON-Lesen, Extraktion von `data.data`, Validierung mit `z.array(ArtworkSchema).parse(...)` und Rückgabe der validierten Liste. Diese Schritte sind durch Codeabgleich bestätigt.
+- **Implementierung:** FR001–FR003 umgesetzt; FR004 und FR012 teilweise umgesetzt; FR005–FR011 offen. FR004 hat noch keinen abschließenden Review-PASS.
+- **Checkpoint-Prüfungen:** TypeScript-Prüfung ohne Dateiausgabe scheitert an TS6133 (Suchfunktion noch ungenutzt). Lint endet mit Exitcode 0, meldet aber dieselbe ungenutzte Funktion als Warnung. Keine eigenständige Reparatur vorgenommen.
+- **Ungeprüft:** Laufzeitverhalten des Services einschließlich HTTP-/Zod-Fehlerpfaden, Live-API-Integration, Browserdarstellung, Produktions-Build und Browserpersistenz. Die Oberfläche ist weiterhin das Startergerüst.
 
 ---
 
@@ -49,8 +49,8 @@ Möglichst konkret, damit Future-Kat nicht erst wieder herausfinden muss,
 wo sie anfangen wollte.
 -->
 
-- In Stage 02 zuerst eine tatsächliche AIC-Suchantwort untersuchen: Welche der vier Schemafelder kommen vor, fehlen oder enthalten `null` bzw. leere Strings? Danach die gewünschte Behandlung für FR003 festlegen; erst anschließend mit dem Fetch-Helper und der Validierung für FR004 fortfahren.
-- **Wiedereinstieg morgen:** `src/schemas/artworkSchema.ts` und die FR003-Reviewnotizen öffnen, dann im Build Guide bei Stage 02 · Schritt 1 einsteigen. Bereits bestätigte Installation und Typableitung nicht wiederholen.
+- Beim nächsten Einstieg in `src/services/artworkServices.ts` zuerst den geplanten `fields`-Parameter für `id,title,artist_title,image_id` ergänzen. Danach die Suchfunktion exportieren und FR004 abschließend prüfen.
+- **Wiedereinstieg morgen oder Sonntag:** Build Guide → Stage 02 · Schritt 3; Schema und abgeschlossene FR003-Prüfung nicht wiederholen.
 
 ---
 
@@ -64,9 +64,10 @@ Technische Mikrodetails dürfen direkt im Code kommentiert oder – wenn sie nur
 zwischengespeichert werden sollen – in NOTES.md geparkt werden.
 -->
 
-- `image_id` akzeptiert `null`, aber kein fehlendes Feld. Ob die API es immer liefert, ist noch ungeprüft. Leere Strings erhalten bisher keine Ersatzwerte.
-- `strict` und `strictNullChecks` sind nicht aktiviert; ein bestandener Typcheck belegt keine strenge Nullsicherheit. Der Artwork-Typ wird noch nicht in fachlichen Komponenten oder States verwendet (FR012).
-- Der historische Scaffold-Befehl und Browserstart wurden im Audit nicht unabhängig bestätigt; dies ist eine Prüfgrenze, kein Nachweis eines defekten Setups.
+- Service: `fields`-Parameter und Export fehlen noch. Die Funktion wird noch nicht verwendet; dadurch derzeit TS6133 sowie eine Lintwarnung.
+- `.parse()` lehnt ungültige Daten mit einer Exception ab; HTTP-Fehler werden ausdrücklich geworfen. Diese Fehlerpfade sind im Code vorhanden, aber noch nicht zur Laufzeit geprüft.
+- Der frühere Strict-Hinweis ist korrigiert: TypeScript 6.0.3 aktiviert Strict-Prüfungen standardmäßig. FR012 bleibt wegen fehlender fachlicher Komponenten-/State-Verwendung offen.
+- Leere Strings bleiben erlaubt und sind kein FR003-Blocker. Der ArtworkCard-Platzhalter ist weiterhin nur geplant.
 
 ---
 
@@ -110,10 +111,10 @@ Nicht jedes technische Detail konservieren:
 - Ist es wichtig, um den aktuellen Projektstand richtig zu verstehen? → hier.
 -->
 
-- Kat schreibt den Anwendungscode selbst. Codex unterstützt beim Prüfen, Erklären und ausdrücklich beauftragten Dokumentieren bzw. Git-Workflow.
-- Die Originalanforderungen FR001–FR012 bleiben unverändert. Requirements enthalten die detaillierte Bewertung, der Build Guide bleibt die Lernroute; dieser State ist der Wiedereinstiegspunkt.
-- Ein erledigter Anforderungsabgleich bedeutet nicht, dass alle Funktionen umgesetzt sind. FR003 und FR012 bleiben offen bis zu ihrem fachlichen Abschluss.
-- Feierabend-Checkpoint: Die geprüften Tagesänderungen sollen gemeinsam versioniert und auf den bestehenden Projektbranch gepusht werden. Der tatsächliche Git-Abschluss wird im Abschlussbericht bestätigt.
+- Kat schreibt den Anwendungscode selbst. Dieser Checkpoint aktualisiert nur Dokumentation und sichert die vorhandenen Tagesänderungen mit Git.
+- Originalanforderungen bleiben unverändert. Details und getrennte Implementierungs-/Reviewstatus stehen in `PROJECT_REQUIREMENTS.md`, die Lernroute im Build Guide.
+- FR003 ist abgeschlossen; FR004 und FR012 sind noch nicht abgeschlossen. Ein vorhandener Codepfad ist kein bestandener Laufzeittest.
+- Der FR-Blerpsi-Pilot läuft weiter; der Bericht für den Dev-Identity-Chat erfolgt erst nach Abschluss des Piloten.
 
 ---
 

@@ -10,7 +10,10 @@ export const ArtworkSchema = z.object({
     .string()
     .nullish()
     .transform((value) => value ?? "Artist unknown."),
-  image_id: z.string().nullable(),
+  image_id: z
+    .string()
+    .nullish()
+    .transform((value) => value ?? null),
 });
 
 export type Artwork = z.infer<typeof ArtworkSchema>;

@@ -5,7 +5,7 @@
 
 ---
 
-**Auditstand · 22.10.2026:** Haken beruhen auf dem vorhandenen Code bzw. den ausgeführten Prüfungen. Der frühere `kat-create`-Aufruf sowie Serverstart und Browserdarstellung sind in diesem Audit nicht belegt; die entsprechenden Haken wurden als ungeprüft geöffnet, nicht als widerlegt bewertet. Zod ist installiert. Schema und abgeleiteter Typ sind vorhanden; die Behandlung fehlender Bildfelder und leerer Angaben bleibt offen (Details im FR-Review in `PROJECT_REQUIREMENTS.md`). Typcheck ohne Dateiausgabe und Lint bestehen. Produktions-Build und Browserprüfung bleiben ungeprüft. Der Anforderungsabgleich ist durchgeführt; die fachlichen Funktionen sind dadurch noch nicht fertig.
+**Auditstand · 23.10.2026:** FR003 ist nach Laufzeit- und Typinferenzprüfung abgeschlossen (Details in `PROJECT_REQUIREMENTS.md`). Die manuelle API-Stichprobe und Datenregeln sind von Kat bestätigt; sie liefern keine allgemeinen API-Garantien. Leere Strings sind bewusst kein FR003-Blocker. Der frühere Strict-Hinweis ist korrigiert: TypeScript 6.0.3 aktiviert Strict-Prüfungen standardmäßig. FR012 bleibt teilweise umgesetzt. FR004 ist in Arbeit: Fetch, Suchbegriff-Kodierung, HTTP-Prüfung, JSON-Auslesen, Array-Validierung und Rückgabe sind im Code vorhanden. Nächster Schritt: `fields` ergänzen, danach Export und abschließender FR004-Review. Die Checkpoint-Typprüfung scheitert aktuell an der noch ungenutzten Suchfunktion (TS6133); Lint meldet dazu eine Warnung. Service-Laufzeitverhalten bleibt ungeprüft. Die im Audit vom 22.10.2026 nicht unabhängig bestätigten historischen Setup-/Browserprüfungen bleiben ungeprüft; ebenso Produktions-Build und Browserpersistenz. Die erfolgreiche Typprüfung aus der FR003-Nachprüfung lag vor dem neuen Service; sie belegt keinen fehlerfreien aktuellen Gesamtstand.
 
 ## 🧭 BUILD ROUTE
 
@@ -76,13 +76,15 @@ Kunstwerkdaten von der API abrufen und mit Zod validieren.
 
 ### 1 · API-Antwort untersuchen (Vorbereitung für FR003–FR004)
 
-- [ ] Die Struktur der tatsächlichen API-Antwort ansehen.
-- [ ] Relevante Felder und mögliche fehlende Werte identifizieren.
+- [x] Die Struktur der tatsächlichen API-Antwort ansehen.
+- [x] Relevante Felder und mögliche fehlende Werte identifizieren.
 
 ### 2 · ArtworkSchema definieren (FR003, FR012)
 
 - [x] Ein Zod-Schema für `id`, `title`, `artist_title` und `image_id` erstellen.
-- [ ] Sinnvolle Behandlung fehlender oder leerer Angaben festlegen.
+- [x] Sinnvolle Behandlung fehlender oder leerer Angaben festlegen.
+
+**Festgelegt:** Fehlend/`null` erhält die vereinbarten Ersatzwerte; leere Strings bleiben vorerst erlaubt. Der Bildplatzhalter `No image available.` ist für ArtworkCard geplant und noch nicht umgesetzt.
 - [x] Den TypeScript-Typ aus dem Schema ableiten.
 
 #### 🧱 DAFÜR BRAUCHST DU
@@ -129,10 +131,12 @@ type Typ = z.infer<typeof Schema>;
 
 ### 3 · API-Daten abrufen und prüfen (FR004)
 
-- [ ] Eine asynchrone Anfrage an die Such-API umsetzen.
-- [ ] Die JSON-Antwort lesen.
-- [ ] Eingehende Kunstwerke mit dem Schema prüfen.
-- [ ] Ungültige Daten kontrolliert behandeln.
+- [x] Eine asynchrone Anfrage an die Such-API umsetzen.
+- [x] Die JSON-Antwort lesen.
+- [x] Eingehende Kunstwerke mit dem Schema prüfen.
+- [x] Ungültige Daten kontrolliert behandeln.
+
+**Checkpoint 23.10.2026:** Die Haken bestätigen vorhandenen Code: `.parse()` lehnt ungültige Daten durch eine Exception ab. Die abschließende Laufzeitprüfung steht aus. Zuerst den geplanten `fields`-Parameter ergänzen, danach die Funktion exportieren und FR004 abschließend prüfen; die Stage-Abschlussbedingung bleibt offen.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -170,7 +174,7 @@ if (result.success) {
 
 ## ✅ FERTIG, WENN
 
-- [ ] Das Schema die benötigten Felder korrekt beschreibt.
+- [x] Das Schema die benötigten Felder korrekt beschreibt.
 - [x] Der Artwork-Typ aus Zod abgeleitet wird.
 - [ ] API-Daten abgerufen und vor der Verwendung validiert werden.
 
