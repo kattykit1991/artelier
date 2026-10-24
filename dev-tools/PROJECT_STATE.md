@@ -15,8 +15,8 @@ Das aktuelle Ziel / die aktuelle Stage.
 Nicht die komplette Projektvision – dafür gibt es PROJECT_START.md.
 -->
 
-- **Checkpoint: 23.10.2026 · Stage 02 – Datenmodell und API.**
-- FR004 schrittweise fertigstellen. FR003 ist erfolgreich geprüft und abgeschlossen.
+- **Zwischen-Checkpoint: 24.10.2026 · Stage 03 – Suche und ArtworkCards.**
+- FR005 ist begonnen, noch nicht abgeschlossen. Die lokale Suche funktioniert; als Nächstes die Suchbedienung und Ergebnisdarstellung ausbauen.
 
 ---
 
@@ -32,11 +32,11 @@ Konkrete technische Details nur dann hier festhalten, wenn sie für das Verstän
 des aktuellen Zustands wirklich wichtig sind.
 -->
 
-- Heute: FR003 nachgeprüft und mit PASS abgeschlossen; fehlende oder `null` gesetzte Bild-IDs werden zu `null` normalisiert. Die 14 Schema-Laufzeitfälle und die Typinferenzprüfung sind im Requirements-Dokument festgehalten.
-- `src/services/artworkServices.ts` enthält die asynchrone Funktion `artworkSearch(query: string)`: dynamischer Suchbegriff mit `encodeURIComponent`, Fetch, HTTP-Prüfung mit `response.ok` und `throw new Error`, JSON-Lesen, Extraktion von `data.data`, Validierung mit `z.array(ArtworkSchema).parse(...)` und Rückgabe der validierten Liste. Diese Schritte sind durch Codeabgleich bestätigt.
-- **Implementierung:** FR001–FR003 umgesetzt; FR004 und FR012 teilweise umgesetzt; FR005–FR011 offen. FR004 hat noch keinen abschließenden Review-PASS.
-- **Checkpoint-Prüfungen:** TypeScript-Prüfung ohne Dateiausgabe scheitert an TS6133 (Suchfunktion noch ungenutzt). Lint endet mit Exitcode 0, meldet aber dieselbe ungenutzte Funktion als Warnung. Keine eigenständige Reparatur vorgenommen.
-- **Ungeprüft:** Laufzeitverhalten des Services einschließlich HTTP-/Zod-Fehlerpfaden, Live-API-Integration, Browserdarstellung, Produktions-Build und Browserpersistenz. Die Oberfläche ist weiterhin das Startergerüst.
+- **FR001–FR004 umgesetzt**, FR003 und FR004 erfolgreich geprüft (Details im Requirements-Piloten). FR005 und FR012 teilweise umgesetzt; FR006–FR011 offen.
+- Die Demoseite ist durch eine einfache Artelier-Oberfläche ersetzt. `App.tsx` verwaltet `query` mit `useState`; das kontrollierte Suchfeld aktualisiert diesen Wert. Whooosh ruft `searchHandle()` auf, das `artworkSearch(query)` abwartet und Ergebnisse ausschließlich in der Konsole ausgibt.
+- **Von Kat bestätigter Safari-Test:** Nach der Referer-Korrektur lieferte die lokale Suche nach `cat` zehn validierte Kunstwerke. Kein eigener Safari-Test in diesem Checkpoint.
+- **Technisch bereits nachgewiesen:** Der laufende Vite-Proxy lieferte ohne Referer HTTP 200 und zehn erfolgreich schema-validierte Kunstwerke; mit lokalem Referer kam eine Cloudflare-403-Sperrseite vom API-Ziel.
+- **Heutige Checkpoint-Prüfungen:** Beide TypeScript-Konfigurationen ohne Dateiausgabe geprüft; Lint ohne Warnungen; Vite-Produktions-Build im Arbeitsspeicher erfolgreich. Kein Browser-Neutest und keine Cloudflare-Pages-Prüfung.
 
 ---
 
@@ -49,8 +49,12 @@ Möglichst konkret, damit Future-Kat nicht erst wieder herausfinden muss,
 wo sie anfangen wollte.
 -->
 
-- Beim nächsten Einstieg in `src/services/artworkServices.ts` zuerst den geplanten `fields`-Parameter für `id,title,artist_title,image_id` ergänzen. Danach die Suchfunktion exportieren und FR004 abschließend prüfen.
-- **Wiedereinstieg morgen oder Sonntag:** Build Guide → Stage 02 · Schritt 3; Schema und abgeschlossene FR003-Prüfung nicht wiederholen.
+1. Suche über Enter und Whooosh gemeinsam mit `form` / `onSubmit` auslösen.
+2. Suchergebnisse im React-State speichern und darstellen; Lade- und Fehlerzustände gemäß Build Guide ergänzen.
+3. Wiederverwendbare ArtworkCard erstellen (FR006).
+4. Anschließend Galerie, `localStorage` und Notizen entlang des Build Guides umsetzen.
+
+- **Wiedereinstieg:** `src/App.tsx` öffnen → Stage 03 · Schritt 1. Die funktionierende Service-/Schema-Verbindung beibehalten.
 
 ---
 
@@ -64,10 +68,10 @@ Technische Mikrodetails dürfen direkt im Code kommentiert oder – wenn sie nur
 zwischengespeichert werden sollen – in NOTES.md geparkt werden.
 -->
 
-- Service: `fields`-Parameter und Export fehlen noch. Die Funktion wird noch nicht verwendet; dadurch derzeit TS6133 sowie eine Lintwarnung.
-- `.parse()` lehnt ungültige Daten mit einer Exception ab; HTTP-Fehler werden ausdrücklich geworfen. Diese Fehlerpfade sind im Code vorhanden, aber noch nicht zur Laufzeit geprüft.
-- Der frühere Strict-Hinweis ist korrigiert: TypeScript 6.0.3 aktiviert Strict-Prüfungen standardmäßig. FR012 bleibt wegen fehlender fachlicher Komponenten-/State-Verwendung offen.
-- Leere Strings bleiben erlaubt und sind kein FR003-Blocker. Der ArtworkCard-Platzhalter ist weiterhin nur geplant.
+- Ergebnisse erscheinen nur in der Konsole. Kein Ergebnis-State, keine ArtworkCards, keine Enter-Suche und keine Lade-/Fehleranzeige. `searchHandle()` fängt abgelehnte Promises noch nicht ab.
+- **Lokale Verbindung:** Vite leitet `/api` mit `changeOrigin: true` an `https://api.artic.edu` weiter. Fetch nutzt die relative API-Adresse und `referrerPolicy: "no-referrer"`, damit der lokale Seitenverweis keine 403-Sperre am API-Ziel auslöst.
+- **Produktion offen:** Der Vite-Development-Proxy wird nicht auf Cloudflare Pages deployt. Für die relative `/api`-Adresse ist vor Veröffentlichung eine Produktionsanbindung erforderlich; sie ist noch nicht implementiert. Ein erfolgreicher Build beweist diese Verbindung nicht.
+- Leere Strings bleiben schema-seitig erlaubt; der Bildplatzhalter ist weiterhin für ArtworkCard geplant.
 
 ---
 
@@ -111,10 +115,10 @@ Nicht jedes technische Detail konservieren:
 - Ist es wichtig, um den aktuellen Projektstand richtig zu verstehen? → hier.
 -->
 
-- Kat schreibt den Anwendungscode selbst. Dieser Checkpoint aktualisiert nur Dokumentation und sichert die vorhandenen Tagesänderungen mit Git.
-- Originalanforderungen bleiben unverändert. Details und getrennte Implementierungs-/Reviewstatus stehen in `PROJECT_REQUIREMENTS.md`, die Lernroute im Build Guide.
-- FR003 ist abgeschlossen; FR004 und FR012 sind noch nicht abgeschlossen. Ein vorhandener Codepfad ist kein bestandener Laufzeittest.
-- Der FR-Blerpsi-Pilot läuft weiter; der Bericht für den Dev-Identity-Chat erfolgt erst nach Abschluss des Piloten.
+- Kat schreibt den Lerncode selbst. Dieser Checkpoint ändert nur Dokumentation und sichert den vorhandenen Arbeitsstand.
+- Originalanforderungen und bestehende Review-Ergebnisse bleiben erhalten. Der Build Guide ist die Lernroute, Requirements enthalten die Detailprüfung.
+- Implementierung, automatisierte Prüfung und von Kat bestätigter Browser-Test sind getrennte Nachweise. FR005 ist trotz funktionierender Suchanfrage noch nicht abgeschlossen.
+- `PROJECT_REQUIREMENTS.md` bleibt ein experimenteller KAT DEV TOOLS-Pilot. Der Bericht für den Dev-Identity-Chat folgt erst nach Abschluss des Piloten.
 
 ---
 

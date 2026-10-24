@@ -5,7 +5,7 @@
 
 ---
 
-**Auditstand · 23.10.2026:** FR003 ist nach Laufzeit- und Typinferenzprüfung abgeschlossen (Details in `PROJECT_REQUIREMENTS.md`). Die manuelle API-Stichprobe und Datenregeln sind von Kat bestätigt; sie liefern keine allgemeinen API-Garantien. Leere Strings sind bewusst kein FR003-Blocker. Der frühere Strict-Hinweis ist korrigiert: TypeScript 6.0.3 aktiviert Strict-Prüfungen standardmäßig. FR012 bleibt teilweise umgesetzt. FR004 ist in Arbeit: Fetch, Suchbegriff-Kodierung, HTTP-Prüfung, JSON-Auslesen, Array-Validierung und Rückgabe sind im Code vorhanden. Nächster Schritt: `fields` ergänzen, danach Export und abschließender FR004-Review. Die Checkpoint-Typprüfung scheitert aktuell an der noch ungenutzten Suchfunktion (TS6133); Lint meldet dazu eine Warnung. Service-Laufzeitverhalten bleibt ungeprüft. Die im Audit vom 22.10.2026 nicht unabhängig bestätigten historischen Setup-/Browserprüfungen bleiben ungeprüft; ebenso Produktions-Build und Browserpersistenz. Die erfolgreiche Typprüfung aus der FR003-Nachprüfung lag vor dem neuen Service; sie belegt keinen fehlerfreien aktuellen Gesamtstand.
+**Checkpoint · 24.10.2026:** FR003 und FR004 abgeschlossen; Stage 03 / FR005 begonnen. Lokale Safari-Suche mit zehn validierten Kunstwerken von Kat bestätigt, Ergebnisse bisher nur in der Konsole. Vite-Development-Proxy und `no-referrer` eingerichtet; Cloudflare-Pages-Anbindung offen. TypeScript, Lint und Vite-Build im Speicher bestehen. Nächster Schritt: Formular-Submit für Enter und Whooosh, danach Ergebnis-State/-Darstellung. Details und Prüfgrenzen im Requirements-Piloten.
 
 ## 🧭 BUILD ROUTE
 
@@ -30,7 +30,7 @@ Die React-/TypeScript-Anwendung läuft lokal und Zod ist installiert.
 - [ ] Artelier mit `kat-create` anlegen.
 - [x] Vite mit React und TypeScript im Projekt einrichten.
 - [x] Abhängigkeiten installieren.
-- [ ] Entwicklungsserver starten und Anwendung im Browser prüfen.
+- [x] Entwicklungsserver starten und Anwendung im Browser prüfen.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -61,7 +61,7 @@ Installiert Zod, damit eingehende Daten zur Laufzeit überprüft werden können.
 
 ## ✅ FERTIG, WENN
 
-- [ ] Die Vite-/React-App im Browser läuft.
+- [x] Die Vite-/React-App im Browser läuft.
 - [x] Zod installiert ist.
 
 ---
@@ -136,7 +136,7 @@ type Typ = z.infer<typeof Schema>;
 - [x] Eingehende Kunstwerke mit dem Schema prüfen.
 - [x] Ungültige Daten kontrolliert behandeln.
 
-**Checkpoint 23.10.2026:** Die Haken bestätigen vorhandenen Code: `.parse()` lehnt ungültige Daten durch eine Exception ab. Die abschließende Laufzeitprüfung steht aus. Zuerst den geplanten `fields`-Parameter ergänzen, danach die Funktion exportieren und FR004 abschließend prüfen; die Stage-Abschlussbedingung bleibt offen.
+**Checkpoint 24.10.2026:** `fields`, Export, Validierung und FR004-Review sind abgeschlossen. Die lokale Suche ist nach Referer-Korrektur erfolgreich; Fehlerfälle wurden im FR004-Review mit Mocks geprüft. Produktionsanbindung bleibt offen.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -176,7 +176,7 @@ if (result.success) {
 
 - [x] Das Schema die benötigten Felder korrekt beschreibt.
 - [x] Der Artwork-Typ aus Zod abgeleitet wird.
-- [ ] API-Daten abgerufen und vor der Verwendung validiert werden.
+- [x] API-Daten abgerufen und vor der Verwendung validiert werden.
 
 ---
 
@@ -190,8 +190,10 @@ Nach Kunstwerken suchen und die Ergebnisse als Karten anzeigen.
 
 ### 1 · Suchoberfläche bauen (FR005)
 
-- [ ] Ein Eingabefeld für den Suchbegriff erstellen.
-- [ ] Den Suchbegriff in React-State verwalten.
+**Zwischenstand:** Button-Suche funktioniert laut Kat in Safari; Ergebnisse nur in der Konsole. Als Nächstes Enter und Whooosh über `form` / `onSubmit` verbinden. Der kombinierte Punkt „Suche auslösen und Ergebnisse im State speichern“ bleibt bis zum Ergebnis-State offen.
+
+- [x] Ein Eingabefeld für den Suchbegriff erstellen.
+- [x] Den Suchbegriff in React-State verwalten.
 - [ ] Die Suche auslösen und Ergebnisse im State speichern.
 - [ ] Lade- und Fehlerzustände sinnvoll anzeigen.
 
@@ -282,7 +284,7 @@ function Card({ eintrag }: Props) {
 
 ## ✅ FERTIG, WENN
 
-- [ ] Ein Suchbegriff eine API-Suche auslöst.
+- [x] Ein Suchbegriff eine API-Suche auslöst.
 - [ ] Gültige Ergebnisse als Karten erscheinen.
 - [ ] Fehlende Daten oder Anfragefehler die Oberfläche nicht abstürzen lassen.
 

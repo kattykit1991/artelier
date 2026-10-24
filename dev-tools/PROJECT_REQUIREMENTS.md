@@ -19,8 +19,8 @@ Die englischen Beschreibungen bleiben unverändert.
 | FR001 | React + Vite (TypeScript) Setup | Scaffold a new project with npm create vite@latest my-app -- --template react-ts                                                                           | 🟢 Umgesetzt | 🟠 Hinweise |
 | FR002 | Install Core Dependencies       | Add Zod via npm install zod.                                                                                                                               | 🟢 Umgesetzt | 🟢 PASS |
 | FR003 | Artwork Zod Schema              | Create ArtworkSchema covering at least id, title, artist_title, image_id, with sensible defaults for missing data.                                         | 🟢 Umgesetzt | 🟢 PASS |
-| FR004 | API Fetch with Validation       | Implement a helper that queries the AIC search endpoint, parses the JSON, and validates it with ArtworkSchema. Reject or handle invalid data.              | 🟡 In Arbeit | 🟠 Hinweise |
-| FR005 | Search Interface                | Create a search interface that allows users to query the API.                                                                                              | ⬜ Offen | 🔴 FAIL |
+| FR004 | API Fetch with Validation       | Implement a helper that queries the AIC search endpoint, parses the JSON, and validates it with ArtworkSchema. Reject or handle invalid data.              | 🟢 Umgesetzt | 🟢 PASS |
+| FR005 | Search Interface                | Create a search interface that allows users to query the API.                                                                                              | 🟡 In Arbeit | 🟠 Hinweise |
 | FR006 | ArtworkCard Component           | Build a reusable ArtworkCard component to display individual pieces of art from the search results. This component will show the image, title, and artist. | ⬜ Offen | 🔴 FAIL |
 | FR007 | Gallery Component               | Develop a Gallery component that will display the collection of artworks the user has saved.                                                               | ⬜ Offen | 🔴 FAIL |
 | FR008 | Create — Add to Gallery         | When the user clicks “Add to Gallery,” push the artwork object into localStorage.                                                                          | ⬜ Offen | 🔴 FAIL |
@@ -53,7 +53,7 @@ Die englischen Beschreibungen bleiben unverändert.
 Hier werden nur relevante Prüfergebnisse festgehalten.
 
 **Audit:** 22.10.2026 · aktueller Arbeitsbaum einschließlich unversionierter Dateien.
-Implementierungsstatus und Reviewstatus sind unabhängig: „In Arbeit“ bedeutet hier teilweise umgesetzt; „Offen“ bedeutet noch nicht umgesetzt. FAIL bei FR005–FR011 bezeichnet die fehlende Implementierung, keinen fehlgeschlagenen Laufzeittest.
+Implementierungsstatus und Reviewstatus sind unabhängig: „In Arbeit“ bedeutet hier teilweise umgesetzt; „Offen“ bedeutet noch nicht umgesetzt. FAIL bei FR006–FR011 bezeichnet die fehlende Implementierung, keinen fehlgeschlagenen Laufzeittest.
 
 ### FR001–FR002 · Projektgerüst und Zod
 
@@ -75,19 +75,47 @@ Implementierungsstatus und Reviewstatus sind unabhängig: „In Arbeit“ bedeut
 
 ### FR004 · API Fetch with Validation
 
-**Checkpoint:** 23.10.2026 · **Implementierung:** Teilweise umgesetzt · **Review:** Hinweise (Codeabgleich; Abschlussprüfung offen)
+**Review:** 24.10.2026 · **Implementierung:** Umgesetzt · **Reviewstatus:** PASS
 
-- `src/services/artworkServices.ts`: `artworkSearch(query: string)` fragt asynchron den AIC-Suchendpunkt ab; der Suchbegriff wird mit `encodeURIComponent()` kodiert.
-- `response.ok` wird geprüft; HTTP-Fehler werfen `Error`. Die JSON-Antwort wird gelesen, `data.data` extrahiert, mit `z.array(ArtworkSchema).parse(...)` validiert und die validierte Liste zurückgegeben. Ungültige Daten werden durch eine Zod-Exception abgelehnt; ein ungültiger Eintrag verwirft damit den gesamten Parse-Vorgang.
-- Noch offen, in geplanter Reihenfolge: `fields=id,title,artist_title,image_id` ergänzen, Funktion exportieren, FR004 abschließend prüfen.
-- Keine Service-Laufzeit- oder Live-API-Tests in diesem Checkpoint. Fehlerbehandlung und Rückgabe sind im Code belegt, aber nicht als bestandene Funktionstests bewertet.
-- Aktuelle Typprüfung: `tsc -p tsconfig.app.json --noEmit --incremental false` scheitert mit TS6133, weil `artworkSearch` noch ungenutzt ist. `npm run lint` endet mit Exitcode 0 und einer Warnung zur ungenutzten Funktion. Das ist ein gesicherter Zwischenstand, kein fehlerfreier Abschluss.
+**Statischer Codeabgleich:**
 
-### FR005–FR011 · Suche und Galerie
+- Der exportierte Helper `artworkSearch(query: string)` verwendet den AIC-Endpunkt `/api/v1/artworks/search`, kodiert den dynamischen Suchbegriff mit `encodeURIComponent()` und fordert `id,title,artist_title,image_id` über `fields` an.
+- `response.ok` erkennt HTTP-Fehler. `response.json()` liest JSON; `data.data` wird als Kunstwerkliste entnommen und durch `z.array(ArtworkSchema).parse(...)` validiert. Transformationen werden angewendet. Ein ungültiger Eintrag lehnt die gesamte Liste ab; dies erfüllt „Reject or handle invalid data“.
+- Compilerbestätigte Rückgabe: `Promise<{ id: number; title: string; artist_title: string; image_id: string | null }[]>`. Der benannte Export ist importierbar. Die fehlende React-Anbindung gehört zu FR005 und blockiert FR004 nicht.
+
+**Tatsächlich ausgeführte Prüfungen:**
+
+- **PASS:** TypeScript für App und Node-Konfiguration, jeweils `--noEmit --incremental false`. Die frühere TS6133-Meldung tritt nach dem Export nicht mehr auf.
+- **PASS:** `npm run lint`, ohne Warnungen oder Fehler.
+- **PASS:** Vite-Produktions-Build über die JS-API mit `write:false`, React-Plugin und ohne Laden der Konfigurationsdatei (`configFile:false`; die bestehende Konfiguration enthält nur dieses Plugin). Keine Build-Ausgaben geschrieben. Das unveränderte `npm run build` wurde nicht ausgeführt, um Build-/Cachedateien zu vermeiden.
+- **PASS: 12 gemockte Prüfungen** am im Speicher gebündelten tatsächlichen Service: gültige Liste; `null`-Transformationen; Transformationen fehlender Felder; leere Trefferliste → `[]`; ungültiger Eintrag in ansonsten gültiger Liste → ZodError; fehlendes `data` → ZodError; `data` als Objekt → ZodError; JSON-Envelope `null` → TypeError; HTTP 500 → eigener Error; Netzwerkfehler → weitergereichter TypeError; ungültiges JSON → SyntaxError; Endpoint, Sonderzeichen-Kodierung und alle vier `fields` per URL-Assertions korrekt.
+- **PASS:** Rückgabetyp über TypeScript-Compiler-API geprüft. Mock-Tests nutzen den benannten Export; keine dauerhaften Testdateien angelegt.
+- **Ungeprüft: aktuelle Live-API-Kompatibilität.** Der direkte echte Fetch-Aufruf scheiterte mit `TypeError: fetch failed`; auch der Web-Zugriff konnte die URL nicht öffnen. Das ist kein belegter Servicefehler. Die bereits von Kat bestätigte API-Stichprobe bei FR003 stützt die erwartete Struktur, ersetzt aber keinen erfolgreichen heutigen Live-Aufruf.
+
+**Hinweise nach Wichtigkeit (keine FR004-Blocker):**
+
+1. Der äußere JSON-Umschlag wird vor `data.data` nicht separat validiert. `response.json()` liefert statisch `any`; erst die Kunstwerkliste wird zur vertrauenswürdigen Ausgabe. Bei `null` entsteht daher ein TypeError statt eines ZodError. Das Promise wird trotzdem abgelehnt; unvalidierte Kunstwerke werden nicht zurückgegeben. Eine gezieltere Envelope-Validierung wäre eine optionale Verbesserung der Fehlermeldungen.
+2. Netzwerkfehler, JSON-Fehler und ZodError propagieren automatisch aus der asynchronen Funktion als abgelehntes Promise. Der spätere Aufrufer muss diese Fehler für die Oberfläche behandeln (FR005). Ein zusätzliches `catch` im Helper ist für FR004 nicht erforderlich.
+3. Die HTTP-Meldung `Something went wrong.` enthält keinen Statuscode. Präzisere Diagnoseinformationen wären optional; die Fehlererkennung funktioniert.
+4. Keine Treffervollständigkeit über mehrere API-Seiten geprüft oder zugesichert; Pagination ist keine zusätzliche FR004-Abschlussbedingung.
+
+**Nächste Lernschritte:** Ergebnisse mit Nabi besprechen; bei verfügbarem Netzwerk einen Live-Smoke-Test nachholen. Anschließend FR005 mit Suchoberfläche sowie Lade-/Fehlerzuständen angehen. Keine Implementierung oder Integration im Rahmen dieses Reviews vorgenommen.
+
+### FR005 · Search Interface
+
+**Checkpoint:** 24.10.2026 · **Implementierung:** Teilweise umgesetzt · **Review:** Hinweise (Abschluss offen)
+
+- Einfache Artelier-Oberfläche mit kontrolliertem Suchfeld und `useState`. Whooosh löst `searchHandle()` aus; dieses wartet `artworkSearch(query)` ab und gibt Ergebnisse in der Konsole aus.
+- **Kat bestätigt:** Safari-Suche nach `cat` liefert nach Referer-Korrektur zehn validierte Kunstwerke. Der frühere technische Proxy-Test bestätigte ebenfalls HTTP 200 und zehn schema-validierte Einträge. Kein erneuter Browser-Test im Checkpoint.
+- **Verbindung:** `vite.config.ts` leitet `/api` mit `changeOrigin: true` an `https://api.artic.edu` weiter. Der Service nutzt `/api/v1/artworks/search` mit den vier Feldern und `referrerPolicy: "no-referrer"`. Weitergereichter lokaler Referer verursachte nachweislich eine Cloudflare-403-Sperrseite vom API-Ziel; ohne Referer war die Anfrage erfolgreich. Dies ergänzt den vorangegangenen FR004-Review um einen lokalen Live-Nachweis; dessen damalige Testgrenzen bleiben historisch erhalten.
+- **Offen:** Enter-/Button-Suche über Formular, Ergebnis-State und Darstellung, Lade-/Fehleranzeige. Abgelehnte Promises werden in `searchHandle()` noch nicht abgefangen. ArtworkCard bleibt FR006.
+- **Produktionsgrenze:** Vite-Development-Proxy funktioniert nicht automatisch auf Cloudflare Pages. Produktionsanbindung für die relative API-Adresse ist offen; keine zusätzliche Infrastruktur implementiert.
+- **Checkpoint-QA:** TypeScript für App und Node mit `--noEmit --incremental false` bestanden; `npm run lint` ohne Warnungen bestanden; Vite-Build mit aktueller Konfiguration über JS-API und `write:false` bestanden. Kein `npm run build` mit Dateiausgabe und kein Produktionsverbindungstest.
+
+### FR006–FR011 · Karten und Galerie
 
 **Implementierung:** Noch nicht umgesetzt · **Review:** FAIL (Codeabgleich)
 
-- **FR005:** Keine Suchoberfläche oder Suchzustände; `App.tsx` enthält die Starterseite mit Zähler.
 - **FR006:** Keine ArtworkCard-Komponente oder Darstellung von Kunstwerkdaten vorhanden.
 - **FR007:** Keine Gallery-Komponente oder Galerieverwaltung vorhanden.
 - **FR008:** Kein „Add to Gallery“ und keine Speicherung in `localStorage` vorhanden.
@@ -100,7 +128,7 @@ Implementierungsstatus und Reviewstatus sind unabhängig: „In Arbeit“ bedeut
 
 **Implementierung:** Teilweise umgesetzt · **Review:** Hinweise
 
-- TypeScript-Projekt und Zod-inferierter Artwork-Typ vorhanden. Der Starterzähler verwendet inferierten Zahlen-State.
+- TypeScript-Projekt und Zod-inferierter Artwork-Typ vorhanden. Das Suchfeld verwendet inferierten String-State; der Service liefert typisierte Kunstwerke. Ein Artwork-Ergebnis-State fehlt noch.
 - Der Artwork-Typ wird bisher in keiner Komponente und keinem fachlichen State verwendet; Such- und Galerie-State fehlen noch.
 - Nachprüfung 23.10.2026: Der frühere Strict-Hinweis war unzutreffend; TypeScript 6.0.3 aktiviert Strict-Prüfungen standardmäßig (Nachweis und Quellen siehe FR003). FR012 bleibt wegen der noch fehlenden fachlichen Verwendung des Artwork-Typs teilweise umgesetzt.
 
