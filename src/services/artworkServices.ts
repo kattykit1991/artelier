@@ -2,9 +2,14 @@ import { ArtworkSchema } from "../schemas/artworkSchema";
 import z from "zod";
 
 export async function artworkSearch(query: string) {
+  // The public AIC API supports browser CORS. Edge-to-AIC requests return 403.
   const response = await fetch(
-    `/api/v1/artworks/search?q=${encodeURIComponent(query)}&fields=id,title,artist_title,image_id`,
-    { referrerPolicy: "no-referrer" },
+    `https://api.artic.edu/api/v1/artworks/search?q=${encodeURIComponent(query)}&fields=id,title,artist_title,image_id&limit=10`,
+    {
+      referrerPolicy: "no-referrer",
+      credentials: "omit",
+      signal: AbortSignal.timeout(10_000),
+    },
   );
   if (!response.ok) {
     const message = response.status === 429

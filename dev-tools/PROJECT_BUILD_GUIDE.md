@@ -5,9 +5,9 @@
 
 ---
 
-**Prüfstand · 25.10.2026:** Alle zwölf FRs sind implementiert und lokal geprüft; FR006 behält wegen externer Bildsperren Hinweise. Explore/My Gallery und responsive Gestaltung stehen. TypeScript/Build, Lint und 23 Tests bestehen; Safari- und Pages-Runtime-Prüfungen sind in `PROJECT_REQUIREMENTS.md` dokumentiert. Vor der Präsentation fehlen Freigabe, Deployment und der Smoke-Test auf der echten HTTPS-Domain. Keine abgeschlossenen Lernschritte wiederholen.
+**Prüfstand · 25.10.2026 nach Produktionsdiagnose:** CUTE_COZY und Kernfunktionen sind veröffentlicht. Die Pages Function erhält produktiv Museum-403 und liefert 502, obwohl lokale Tests erfolgreich waren. Der Suchservice ist jetzt minimal auf den offiziell unterstützten CORS-Direktzugriff umgestellt; Zod bleibt erhalten. Safari-Test aus der Live-Origin und Live-Formular mit temporärem Transportadapter erfolgreich. Build, Lint und 23 Tests bestehen. Korrektur noch nicht committed oder deployt; nach Freigabe echte Live-Suche erneut prüfen.
 
-**Lokal / Deployment:** `npm run dev` nutzt weiterhin Vite; `npm run build`, `npm run lint`, `npm run test` prüfen den Stand. Den Produktionspfad mit `npx wrangler pages dev dist --port 8788 --compatibility-date 2026-10-25` nach dem Build testen. Für Git-basiertes Pages-Deployment: Build `npm run build`, Ausgabeverzeichnis `dist`, Projektwurzel mit `functions/`. `npm run preview` hat keine Functions. Keine Secrets nötig. Details und verbleibender Live-Test im Savegame.
+**Lokal / Deployment:** `npm run dev` startet Vite; die korrigierte Suche nutzt direkt die öffentliche Museum-API; `npm run build`, `npm run lint`, `npm run test` prüfen den Stand. Den Produktionspfad mit `npx wrangler pages dev dist --port 8788 --compatibility-date 2026-10-25` nach dem Build testen. Für Git-basiertes Pages-Deployment: Build `npm run build`, Ausgabeverzeichnis `dist`, Projektwurzel mit `functions/`. `npm run preview` hat keine Functions. Keine Secrets nötig. Details und verbleibender Live-Test im Savegame.
 
 ## 🧭 BUILD ROUTE
 
@@ -138,7 +138,7 @@ type Typ = z.infer<typeof Schema>;
 - [x] Eingehende Kunstwerke mit dem Schema prüfen.
 - [x] Ungültige Daten kontrolliert behandeln.
 
-**Abgeschlossen:** `fields`, Export und Validierung bleiben erhalten. Die Pages Function stellt denselben API-Pfad produktiv bereit; lokal im Pages-Runtime und aus Safari ohne Vite-Proxy mit echten Antworten geprüft. Veröffentlichung und Live-Abnahme stehen noch aus.
+**Korrektur vorbereitet:** `fields`, Export und Validierung bleiben erhalten. Wegen produktivem Upstream-403 der Function verwendet der Service nun den öffentlichen CORS-Direktzugriff. Live-Origin/temporärer Formulartest bestanden; Deployment der Korrektur und erneute Live-Abnahme stehen aus.
 
 #### 🧱 DAFÜR BRAUCHST DU
 

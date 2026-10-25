@@ -16,7 +16,7 @@ Nicht die komplette Projektvision – dafür gibt es PROJECT_START.md.
 -->
 
 - **Stand: 25.10.2026 · Stage 05 – Abschluss / WBS-Präsentation am 26.10. vormittags.**
-- Implementierung und lokale Prüfungen abgeschlossen; nächster Schritt ist Kats Freigabe für Commit/Push und danach der kurze Live-Test auf `https://artelier.katcoded.de`.
+- CUTE_COZY ist veröffentlicht. Ein produktiver Upstream-403 der Such-Function wurde diagnostiziert; der minimale CORS-Direktzugriff ist lokal vorbereitet und wartet auf erneute Commit-/Push-Freigabe.
 
 ---
 
@@ -32,11 +32,11 @@ Konkrete technische Details nur dann hier festhalten, wenn sie für das Verstän
 des aktuellen Zustands wirklich wichtig sind.
 -->
 
-- FR001–FR012 sind im Code umgesetzt. Reviews lokal PASS, bei FR006 Hinweise zur externen Bildverfügbarkeit; detaillierte Nachweise stehen im Requirements-Piloten.
+- FR001–FR012 sind im Code umgesetzt. Reviews lokal PASS, bei FR004 Hinweise zum ausstehenden Produktionsfix-Deployment und bei FR006 zur externen Bildverfügbarkeit; detaillierte Nachweise stehen im Requirements-Piloten.
 - Ruhige Galerie-Oberfläche mit Explore/My Gallery, responsiven Karten, Suchformular, Lade-/Fehlerzuständen, Saved-Zustand, Leerzuständen, Notizen und Bild-Fallback. Die von Kat geschriebene Such-, Galerie-, Speicher- und Notizlogik bleibt weitgehend erhalten.
-- **Produktionssuche vorbereitet und technisch lokal geprüft:** Pages Function für `/api/v1/artworks/search`; fester AIC-Host, sichere Suchparameter, eigener Artelier-User-Agent, Zehn-Sekunden-Timeout und JSON-Fehler. Der Browser-Service und Zod bleiben erhalten. Lokal kann weiter der Vite-Proxy verwendet werden.
-- **QA:** `npm run build` und `npm run lint` bestanden; `npm run test` 23/23 bestanden. Echter Pages-Runtime: `cat`/`Monet` → HTTP 200 mit je zehn validierten Kunstwerken. Safari-Suche über den gebauten Pages-Stand ohne Vite-Proxy erfolgreich.
-- **Safari geprüft:** Enter/Button, Speichern/Saved-Sperre, Galerie, Notiz, Persistenz nach Reload, Entfernen, Desktop und 320-Pixel-Ansicht. Bildfehler zeigen Fallback. Testeintrag wieder entfernt. Noch kein Live-Deployment dieser Änderungen.
+- **Aktueller Suchtransport nach Produktionsdiagnose:** Browser fragt die offizielle öffentliche AIC-CORS-API direkt ab, ohne Cookies, mit bestehendem `no-referrer` und Zehn-Sekunden-Timeout. Zod bleibt erhalten. Pages Function/Vite-Proxy bleiben unverändert, werden nach Deployment der Korrektur jedoch nicht mehr für die Suche benötigt.
+- **QA zum Produktionsfix:** Build, Lint und 23/23 Tests bestanden. Produktiver Log-Tail bestätigt Museum-403 → Function-502. Safari-Direktzugriff von der echten HTTPS-Origin liefert 200/CORS mit zehn Kunstwerken. Live-Formular mit temporärem Testtransport zeigt zehn validierte Karten und echte Bilder; Testadapter danach per Reload entfernt.
+- **Safari geprüft:** Enter/Button, Speichern/Saved-Sperre, Galerie, Notiz, Persistenz nach Reload, Entfernen, Desktop und 320-Pixel-Ansicht. Bildfehler zeigen Fallback. Testeintrag wieder entfernt. CORS-Korrektur noch nicht veröffentlicht; kein Commit oder Push in diesem Reparaturauftrag.
 
 ---
 
@@ -54,7 +54,7 @@ wo sie anfangen wollte.
 3. Auf `artelier.katcoded.de` nach `cat` oder `Monet` suchen, eingebettete Bilder prüfen, ein Werk speichern, Notiz eingeben, neu laden und wieder entfernen.
 
 - Lokal: `npm install` nur beim frischen Checkout, dann `npm run dev`. QA: `npm run build`, `npm run lint`, `npm run test` (Tests unter Node 24 geprüft).
-- Produktionspfad lokal: `npm run build`, dann `npx wrangler pages dev dist --port 8788 --compatibility-date 2026-10-25`. Dies verwendet Functions statt des Vite-Proxys. `npm run preview` allein führt keine Pages Functions aus.
+- Produktionspfad lokal: `npm run build`, dann `npx wrangler pages dev dist --port 8788 --compatibility-date 2026-10-25`. Dies testet noch die vorhandene, für die korrigierte Suche ungenutzte Function. Die Browser-Suche verwendet direkt die öffentliche API. `npm run preview` allein führt keine Pages Functions aus.
 
 ---
 
@@ -68,8 +68,8 @@ Technische Mikrodetails dürfen direkt im Code kommentiert oder – wenn sie nur
 zwischengespeichert werden sollen – in NOTES.md geparkt werden.
 -->
 
-- **Bilder:** Externer IIIF-/Cloudflare-Schutz liefert lokal teilweise HTTP 403. HTTPS-Referer der echten Domain lieferte im HTTP-Test JPEG/200; eingebettete Bilder auf der neuen Live-Seite sind noch ungeprüft. Gestalteter Fallback hält die App bedienbar. Kein zusätzlicher Bildproxy oder Dienst.
-- **Live-Stand:** Vor Freigabe ist noch die alte Website aktiv; `/api/v1/...` liefert dort HTML. Die neue Produktionsroute wurde im lokalen Cloudflare-Runtime und direkt, nicht auf der Cloudflare-Edge, geprüft.
+- **Bilder:** Lokal teilweise HTTP 403; im temporären Live-Suchtest auf HTTPS waren echte Bilder sichtbar. Keine allgemeine Verfügbarkeitsgarantie; Fallback bleibt unverändert.
+- **Live-Stand:** Design und Kernfunktionen sind veröffentlicht; die Such-Function erhält vom Museum 403 und liefert deshalb 502. Die konkrete Sperrregel ist unbekannt. Die vorbereitete Korrektur verwendet den offiziell unterstützten Browserzugriff statt dieses Edge-Pfads; sie braucht noch ein Deployment.
 - localStorage ist browser- und originabhängig. Galerie auf localhost und unter HTTPS sind getrennt. Schreibfehler werden angezeigt; bei ungültigen gespeicherten Daten startet die bestehende Ladefunktion mit leerer Galerie.
 
 ---

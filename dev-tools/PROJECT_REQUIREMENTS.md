@@ -19,7 +19,7 @@ Die englischen Beschreibungen bleiben unverändert.
 | FR001 | React + Vite (TypeScript) Setup | Scaffold a new project with npm create vite@latest my-app -- --template react-ts                                                                           | 🟢 Umgesetzt | 🟢 PASS |
 | FR002 | Install Core Dependencies       | Add Zod via npm install zod.                                                                                                                               | 🟢 Umgesetzt | 🟢 PASS |
 | FR003 | Artwork Zod Schema              | Create ArtworkSchema covering at least id, title, artist_title, image_id, with sensible defaults for missing data.                                         | 🟢 Umgesetzt | 🟢 PASS |
-| FR004 | API Fetch with Validation       | Implement a helper that queries the AIC search endpoint, parses the JSON, and validates it with ArtworkSchema. Reject or handle invalid data.              | 🟢 Umgesetzt | 🟢 PASS |
+| FR004 | API Fetch with Validation       | Implement a helper that queries the AIC search endpoint, parses the JSON, and validates it with ArtworkSchema. Reject or handle invalid data.              | 🟢 Umgesetzt | 🟠 Hinweise |
 | FR005 | Search Interface                | Create a search interface that allows users to query the API.                                                                                              | 🟢 Umgesetzt | 🟢 PASS |
 | FR006 | ArtworkCard Component           | Build a reusable ArtworkCard component to display individual pieces of art from the search results. This component will show the image, title, and artist. | 🟢 Umgesetzt | 🟠 Hinweise |
 | FR007 | Gallery Component               | Develop a Gallery component that will display the collection of artworks the user has saved.                                                               | 🟢 Umgesetzt | 🟢 PASS |
@@ -52,7 +52,7 @@ Die englischen Beschreibungen bleiben unverändert.
 
 Hier werden nur relevante Prüfergebnisse festgehalten.
 
-**Prüfstand: 25.10.2026 · Präsentationsvorbereitung.** Implementierung und Review sind getrennt: Alle zwölf FRs sind im Code umgesetzt. PASS bezeichnet den unten belegten lokalen Code-/Teststand, keine Bestätigung des noch ausstehenden Deployments. FR006 behält wegen externer Bildsperren den Reviewstatus „Hinweise“.
+**Prüfstand: 25.10.2026 · Präsentationsvorbereitung.** Implementierung und Review sind getrennt: Alle zwölf FRs sind im Code umgesetzt. PASS bezeichnet den unten belegten lokalen Code-/Teststand, keine Bestätigung des noch ausstehenden Deployments. FR004 behält wegen des noch ausstehenden Deployments der Produktionskorrektur und FR006 wegen externer Bildverfügbarkeit den Reviewstatus „Hinweise“.
 
 ### FR001–FR003 · Grundlage und Schema
 
@@ -63,13 +63,16 @@ Hier werden nur relevante Prüfergebnisse festgehalten.
 
 ### FR004 · API Fetch with Validation
 
-**Implementierung:** Umgesetzt · **Review:** PASS (lokaler Pages-Runtime und Service-Tests; Live-Deployment offen)
+**Implementierung:** Umgesetzt · **Review:** Hinweise (Produktionskorrektur lokal vorbereitet; erneutes Deployment offen)
 
-- Der exportierte Helper nutzt weiterhin `/api/v1/artworks/search`, `encodeURIComponent()`, HTTP-Prüfung und Zod. Zusätzlich werden JSON-Content-Type und der äußere `{ data: [...] }`-Umschlag geprüft; Rückgabe bleibt `Promise<Artwork[]>`.
-- **Produktion:** `functions/api/v1/artworks/search.ts` bildet denselben Pfad als [Pages Function](https://developers.cloudflare.com/pages/functions/get-started/) ab. Nur GET, genau ein getrimmter Suchbegriff mit 1–200 Zeichen, fester HTTPS-Zielhost, feste vier Felder und maximal zehn Treffer. Keine beliebigen Ziel-URLs, Browser-Cookies oder Browser-Referer; keine Secrets.
-- Ausgehende Anfrage mit transparenter Artelier-User-Agent-Kennung. Diagnostisch reproduziert: ohne User-Agent 403; mit Kennung und im lokalen Cloudflare-Runtime 200. Timeout nach zehn Sekunden; HTTP-, HTML-Challenge- und Netzwerkfehler werden als kontrollierte JSON-Fehlerantworten behandelt. Redirects werden nicht verfolgt.
-- **Echt geprüft:** Handler direkt und unter `wrangler pages dev dist` ohne Vite-Proxy; `cat` und `Monet` liefern HTTP 200 und je zehn Zod-validierbare Kunstwerke. Safari auf `localhost:8788` zeigt zehn Suchergebnisse über diesen Pages-Pfad.
-- Der frühere Review vom 24.10. bestätigte zwölf gemockte Servicefälle; die heutigen reproduzierbaren Tests erweitern/ersetzen diese Stichproben. Typ-, Lint- und Build-Probleme aus früheren Zwischenständen sind behoben.
+- Der exportierte Helper fragt jetzt direkt `https://api.artic.edu/api/v1/artworks/search` ab: kodierter Suchbegriff, vier feste Felder, maximal zehn Treffer. Der bestehende öffentliche, vom Museum dokumentierte CORS-Zugriff benötigt keine Secrets oder neuen Dependencies. `no-referrer` bleibt erhalten; Cookies werden mit `credentials: "omit"` ausgeschlossen, Timeout nach zehn Sekunden.
+- HTTP- und JSON-Content-Type-Prüfung sowie Zod-Validierung des `{ data: Artwork[] }`-Umschlags bleiben erhalten. Rückgabe bleibt `Promise<Artwork[]>`. Design, Galerie, Notizen und localStorage sind unverändert.
+- **Produktionsdiagnose nach Deployment am 25.10.2026:** Live-Domain und Pages-Deployment liefern am Function-Pfad 502/JSON. Der zugängliche produktive Cloudflare-Log-Tail zeigt `AIC search upstream error { status: 403 }`, keine Function-Exception. Die Function wandelt diesen Upstream-403 in 502 um. Derselbe Request direkt vom Rechner liefert 200/JSON mit `Access-Control-Allow-Origin: *`.
+- **Grenze der Diagnose:** Die vorhandenen Logs erfassen weder Upstream-Body noch dessen Header. Deshalb ist keine konkrete Challenge oder einzelne WAF-/IP-Regel nachgewiesen. Belegt ist der unterschiedliche Ausgang aus tatsächlicher Cloudflare-Edge und lokalem Runtime/Rechner; weitere Header-Experimente wurden unterlassen.
+- **Zulässige Alternative tatsächlich geprüft:** Safari direkt aus `https://artelier.katcoded.de` → Museum-API: 200, CORS-Antwort lesbar, zehn Datensätze. Anschließend das Live-Suchformular mit ausschließlich temporär im Tab umgeleitetem Suchtransport ausgeführt: zehn Zod-validierte Karten und tatsächlich sichtbare Bilder. Kein Deployment verändert; Testadapter durch Neuladen vollständig entfernt. Dies ist ein End-to-End-Transporttest, keine Abnahme eines neu deployten Bundles.
+- **QA:** `npm run build`, `npm run lint`, `npm run test` (23/23) erfolgreich. Der Service-Test prüft jetzt den offiziellen CORS-Endpunkt, Query, Felder, Limit, ausgeschlossene Cookies und Timeout. Frühere Pages-Handler-Tests bleiben technische Regressionstests; sie beweisen keine Erreichbarkeit von Cloudflare-Edge zum Museum.
+- **Nach Deployment:** Der Browser verwendet die Pages Function und den Vite-Proxy nicht mehr. Beide Dateien bleiben für diesen minimalen Fix unverändert, sind aber nicht der aktive Suchtransport. Die alte `/api/v1/...`-Function kann weiterhin 502 liefern; maßgeblich ist die ausgehende Browseranfrage an `api.artic.edu`.
+- Referenz: [AIC-Dokumentation zu CORS und öffentlichem API-Zugriff](https://api.artic.edu/docs/). Keine Umgehung einer Challenge, kein Spoofing von Herkunfts-/Client-IP-Headern und kein weiterer Proxy-Dienst.
 
 ### FR005–FR009 · Suche, Karten und Galerie
 
@@ -95,7 +98,7 @@ Hier werden nur relevante Prüfergebnisse festgehalten.
 
 ### Produktionsgrenzen und verbleibende Prüfung
 
-- **Noch nicht deployt, kein Commit oder Push.** Die derzeitige Live-Domain liefert am API-Pfad noch HTML der alten statischen App; die neue Function ist nur lokal geprüft. Nach Freigabe Git-basiertes Pages-Deployment mit Build `npm run build`, Ausgabe `dist`, Projektwurzel mit `functions/` verwenden. `public/_routes.json` begrenzt Functions auf `/api/*`.
+- **Produktionsfix noch nicht deployt.** Der CUTE_COZY-Stand ist bereits veröffentlicht; seine Function erhält produktiv Upstream-403 und liefert 502. Der jetzt vorbereitete Direktzugriff benötigt ein neues Git-/Pages-Deployment nach Freigabe. Build bleibt `npm run build`, Ausgabe `dist`. Die alte Function bleibt vorhanden, wird von der korrigierten Suche aber nicht mehr aufgerufen.
 - **Bildserver bleibt extern:** HTTP-Test mit Referer `https://artelier.katcoded.de/` lieferte ein echtes JPEG (200). Dies beweist keinen erfolgreichen eingebetteten Safari-Bildtest auf der neuen Live-Seite. Lokal liefert der Server weiterhin teilweise 403/HTML. Keine spekulativen Hostwechsel oder Bildproxy-Infrastruktur eingebaut. Bildladefehler beeinträchtigen Suche/Galerie/Notizen nicht.
 - Vor der Präsentation auf der echten Domain Suche, eingebettete Bilder, Speichern, Notiz, Reload und Entfernen kurz prüfen. localStorage ist pro Origin getrennt; lokale Galerieeinträge erscheinen nicht automatisch auf HTTPS. Privater Modus, manuelles Löschen oder Browser-Speicherlimits können Persistenz einschränken.
 

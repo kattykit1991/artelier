@@ -70,11 +70,16 @@ const bundle = await build({ configFile: false, logLevel: "silent", build: {
 const code = (Array.isArray(bundle) ? bundle[0] : bundle).output.find((item) => item.type === "chunk").code;
 const { artworkSearch } = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`);
 
-await test("Service: local path, encoded query, schema transformations", async (t) => {
+await test("Service: public CORS endpoint, encoded query, schema transformations", async (t) => {
   t.mock.method(globalThis, "fetch", async (url, options) => {
-    assert.equal(new URL(url, "http://localhost").searchParams.get("q"), "cat & café");
-    assert.ok(url.startsWith("/api/v1/artworks/search?"));
+    const target = new URL(url);
+    assert.equal(target.origin + target.pathname, "https://api.artic.edu/api/v1/artworks/search");
+    assert.equal(target.searchParams.get("q"), "cat & café");
+    assert.equal(target.searchParams.get("fields"), "id,title,artist_title,image_id");
+    assert.equal(target.searchParams.get("limit"), "10");
     assert.equal(options.referrerPolicy, "no-referrer");
+    assert.equal(options.credentials, "omit");
+    assert.ok(options.signal instanceof AbortSignal);
     return Response.json({ data: [{ id: 1, title: null, artist_title: null }] });
   });
   assert.deepEqual(await artworkSearch("cat & café"), [{ id: 1, title: "Untitled", artist_title: "Artist unknown.", image_id: null }]);
