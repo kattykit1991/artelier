@@ -15,8 +15,8 @@ Das aktuelle Ziel / die aktuelle Stage.
 Nicht die komplette Projektvision – dafür gibt es PROJECT_START.md.
 -->
 
-- **Zwischen-Checkpoint: 24.10.2026 · Stage 03 – Suche und ArtworkCards.**
-- FR005 ist begonnen, noch nicht abgeschlossen. Die lokale Suche funktioniert; als Nächstes die Suchbedienung und Ergebnisdarstellung ausbauen.
+- **Stand: 25.10.2026 · Stage 05 – Abschluss / WBS-Präsentation am 26.10. vormittags.**
+- Implementierung und lokale Prüfungen abgeschlossen; nächster Schritt ist Kats Freigabe für Commit/Push und danach der kurze Live-Test auf `https://artelier.katcoded.de`.
 
 ---
 
@@ -32,11 +32,11 @@ Konkrete technische Details nur dann hier festhalten, wenn sie für das Verstän
 des aktuellen Zustands wirklich wichtig sind.
 -->
 
-- **FR001–FR004 umgesetzt**, FR003 und FR004 erfolgreich geprüft (Details im Requirements-Piloten). FR005 und FR012 teilweise umgesetzt; FR006–FR011 offen.
-- Die Demoseite ist durch eine einfache Artelier-Oberfläche ersetzt. `App.tsx` verwaltet `query` mit `useState`; das kontrollierte Suchfeld aktualisiert diesen Wert. Whooosh ruft `searchHandle()` auf, das `artworkSearch(query)` abwartet und Ergebnisse ausschließlich in der Konsole ausgibt.
-- **Von Kat bestätigter Safari-Test:** Nach der Referer-Korrektur lieferte die lokale Suche nach `cat` zehn validierte Kunstwerke. Kein eigener Safari-Test in diesem Checkpoint.
-- **Technisch bereits nachgewiesen:** Der laufende Vite-Proxy lieferte ohne Referer HTTP 200 und zehn erfolgreich schema-validierte Kunstwerke; mit lokalem Referer kam eine Cloudflare-403-Sperrseite vom API-Ziel.
-- **Heutige Checkpoint-Prüfungen:** Beide TypeScript-Konfigurationen ohne Dateiausgabe geprüft; Lint ohne Warnungen; Vite-Produktions-Build im Arbeitsspeicher erfolgreich. Kein Browser-Neutest und keine Cloudflare-Pages-Prüfung.
+- FR001–FR012 sind im Code umgesetzt. Reviews lokal PASS, bei FR006 Hinweise zur externen Bildverfügbarkeit; detaillierte Nachweise stehen im Requirements-Piloten.
+- Ruhige Galerie-Oberfläche mit Explore/My Gallery, responsiven Karten, Suchformular, Lade-/Fehlerzuständen, Saved-Zustand, Leerzuständen, Notizen und Bild-Fallback. Die von Kat geschriebene Such-, Galerie-, Speicher- und Notizlogik bleibt weitgehend erhalten.
+- **Produktionssuche vorbereitet und technisch lokal geprüft:** Pages Function für `/api/v1/artworks/search`; fester AIC-Host, sichere Suchparameter, eigener Artelier-User-Agent, Zehn-Sekunden-Timeout und JSON-Fehler. Der Browser-Service und Zod bleiben erhalten. Lokal kann weiter der Vite-Proxy verwendet werden.
+- **QA:** `npm run build` und `npm run lint` bestanden; `npm run test` 23/23 bestanden. Echter Pages-Runtime: `cat`/`Monet` → HTTP 200 mit je zehn validierten Kunstwerken. Safari-Suche über den gebauten Pages-Stand ohne Vite-Proxy erfolgreich.
+- **Safari geprüft:** Enter/Button, Speichern/Saved-Sperre, Galerie, Notiz, Persistenz nach Reload, Entfernen, Desktop und 320-Pixel-Ansicht. Bildfehler zeigen Fallback. Testeintrag wieder entfernt. Noch kein Live-Deployment dieser Änderungen.
 
 ---
 
@@ -49,12 +49,12 @@ Möglichst konkret, damit Future-Kat nicht erst wieder herausfinden muss,
 wo sie anfangen wollte.
 -->
 
-1. Suche über Enter und Whooosh gemeinsam mit `form` / `onSubmit` auslösen.
-2. Suchergebnisse im React-State speichern und darstellen; Lade- und Fehlerzustände gemäß Build Guide ergänzen.
-3. Wiederverwendbare ArtworkCard erstellen (FR006).
-4. Anschließend Galerie, `localStorage` und Notizen entlang des Build Guides umsetzen.
+1. Abschlussbericht prüfen und finalen Commit/Push ausdrücklich freigeben. Bis dahin keine Git-Veröffentlichung.
+2. Pages-Build prüfen: `npm run build`, Ausgabe `dist`, Projektwurzel einschließlich `functions/`; Git-Deployment verwenden.
+3. Auf `artelier.katcoded.de` nach `cat` oder `Monet` suchen, eingebettete Bilder prüfen, ein Werk speichern, Notiz eingeben, neu laden und wieder entfernen.
 
-- **Wiedereinstieg:** `src/App.tsx` öffnen → Stage 03 · Schritt 1. Die funktionierende Service-/Schema-Verbindung beibehalten.
+- Lokal: `npm install` nur beim frischen Checkout, dann `npm run dev`. QA: `npm run build`, `npm run lint`, `npm run test` (Tests unter Node 24 geprüft).
+- Produktionspfad lokal: `npm run build`, dann `npx wrangler pages dev dist --port 8788 --compatibility-date 2026-10-25`. Dies verwendet Functions statt des Vite-Proxys. `npm run preview` allein führt keine Pages Functions aus.
 
 ---
 
@@ -68,10 +68,9 @@ Technische Mikrodetails dürfen direkt im Code kommentiert oder – wenn sie nur
 zwischengespeichert werden sollen – in NOTES.md geparkt werden.
 -->
 
-- Ergebnisse erscheinen nur in der Konsole. Kein Ergebnis-State, keine ArtworkCards, keine Enter-Suche und keine Lade-/Fehleranzeige. `searchHandle()` fängt abgelehnte Promises noch nicht ab.
-- **Lokale Verbindung:** Vite leitet `/api` mit `changeOrigin: true` an `https://api.artic.edu` weiter. Fetch nutzt die relative API-Adresse und `referrerPolicy: "no-referrer"`, damit der lokale Seitenverweis keine 403-Sperre am API-Ziel auslöst.
-- **Produktion offen:** Der Vite-Development-Proxy wird nicht auf Cloudflare Pages deployt. Für die relative `/api`-Adresse ist vor Veröffentlichung eine Produktionsanbindung erforderlich; sie ist noch nicht implementiert. Ein erfolgreicher Build beweist diese Verbindung nicht.
-- Leere Strings bleiben schema-seitig erlaubt; der Bildplatzhalter ist weiterhin für ArtworkCard geplant.
+- **Bilder:** Externer IIIF-/Cloudflare-Schutz liefert lokal teilweise HTTP 403. HTTPS-Referer der echten Domain lieferte im HTTP-Test JPEG/200; eingebettete Bilder auf der neuen Live-Seite sind noch ungeprüft. Gestalteter Fallback hält die App bedienbar. Kein zusätzlicher Bildproxy oder Dienst.
+- **Live-Stand:** Vor Freigabe ist noch die alte Website aktiv; `/api/v1/...` liefert dort HTML. Die neue Produktionsroute wurde im lokalen Cloudflare-Runtime und direkt, nicht auf der Cloudflare-Edge, geprüft.
+- localStorage ist browser- und originabhängig. Galerie auf localhost und unter HTTPS sind getrennt. Schreibfehler werden angezeigt; bei ungültigen gespeicherten Daten startet die bestehende Ladefunktion mit leerer Galerie.
 
 ---
 
@@ -84,7 +83,8 @@ Hier dürfen die „OH UND MAN KÖNNTE NOCH—“-Blerps sicher geparkt werden,
 ohne den aktuellen Build zu entführen.
 -->
 
-- Keine zusätzlichen Sidequests beschlossen. Der FR-Blerpsi-Pilot läuft weiter; der Bericht für den Dev-Identity-Chat erfolgt erst nach Abschluss des Piloten.
+- Keine neuen Produktfeatures für diese Abgabe. Optimierungen der externen Bildverfügbarkeit nur bei Bedarf nach dem echten HTTPS-Test.
+- FR-Blerpsi bleibt ein KAT DEV TOOLS-Pilot. Bericht für den Dev-Identity-Chat erst nach Abschluss des Piloten.
 
 ---
 
@@ -97,7 +97,7 @@ Kein Grund, den aktuellen Flow zu unterbrechen.
 Hier landet technischer oder struktureller Cleanup, der gerade nicht wichtig genug ist.
 -->
 
-- Aktuell keine konkrete zusätzliche Cleanup-Aufgabe bestätigt.
+- Kein abgaberelevanter Cleanup offen. Frühere Vite-Assets können vorerst ungenutzt im Projekt bleiben; Stabilität geht vor Aufräumen.
 
 ---
 
@@ -115,10 +115,10 @@ Nicht jedes technische Detail konservieren:
 - Ist es wichtig, um den aktuellen Projektstand richtig zu verstehen? → hier.
 -->
 
-- Kat schreibt den Lerncode selbst. Dieser Checkpoint ändert nur Dokumentation und sichert den vorhandenen Arbeitsstand.
-- Originalanforderungen und bestehende Review-Ergebnisse bleiben erhalten. Der Build Guide ist die Lernroute, Requirements enthalten die Detailprüfung.
-- Implementierung, automatisierte Prüfung und von Kat bestätigter Browser-Test sind getrennte Nachweise. FR005 ist trotz funktionierender Suchanfrage noch nicht abgeschlossen.
-- `PROJECT_REQUIREMENTS.md` bleibt ein experimenteller KAT DEV TOOLS-Pilot. Der Bericht für den Dev-Identity-Chat folgt erst nach Abschluss des Piloten.
+- Kat hat die Kernfunktionen mit Lernbegleitung selbst implementiert. Codex durfte für diese Finalisierung ausdrücklich die Produktionsverbindung, notwendige Fehlerbehandlung, Gestaltung und QA ergänzen.
+- Keine neuen Dependencies. Pages Function benötigt keine Secrets oder separaten Dienst. `functions/` liegt in der Projektwurzel; der Build typprüft die Function über `tsconfig.functions.json`.
+- Originalanforderungen FR001–FR012 bleiben unverändert. Code-/Mock-, Runtime- und Browser-Nachweise sowie Live-Prüfgrenzen getrennt behandeln.
+- Keine Commits oder Pushes in diesem Auftrag. Deployment ist der verbleibende Freigabe-Schritt.
 
 ---
 

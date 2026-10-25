@@ -27,3 +27,8 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Local Cloudflare tooling
+.wrangler/
+.dev.vars
+.dev.vars.*

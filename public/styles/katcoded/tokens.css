@@ -1,0 +1,96 @@
+/* KATCODED · CUTE_COZY Style Foundation v0.1 · 22.10.2026
+   Freigegebene Werte aus demo/preview.css. Nur Tokens und Varianten.
+   Kein Dark Mode. Fonts und Designprimitiven: theme.css. */
+:root {
+  color-scheme: light;
+  --kat-font-body: "Nunito Sans", system-ui, sans-serif;
+  --kat-focus: var(--cozy-strong);
+  --cozy-pink: #F8D7E6;
+  --cozy-cream: #FFF8F0;
+  --cozy-font-display: "Quicksand", system-ui, sans-serif;
+  --cozy-size-body: 1rem;
+  --cozy-size-hero: clamp(2.7rem, 5.2vw, 4.25rem);
+  --cozy-size-h2: clamp(1.65rem, 2.8vw, 2.3rem);
+  --cozy-size-h3: 1.35rem;
+  --cozy-size-h4: 1rem;
+  --cozy-size-reading: 0.95rem;
+  --cozy-size-caption: 0.7rem;
+  --cozy-size-button: 0.86rem;
+  --cozy-size-field: 0.9rem;
+  --cozy-leading-body: 1.7;
+  --cozy-leading-reading: 1.85;
+  --cozy-leading-ui: 1.5;
+  --cozy-leading-display: 1.25;
+  --cozy-leading-hero: 1.16;
+  --cozy-tracking-display: -0.035em;
+  --cozy-space-1: 0.5rem;
+  --cozy-space-2: 0.75rem;
+  --cozy-space-3: 1rem;
+  --cozy-space-4: 1.2rem;
+  --cozy-space-5: 1.5rem;
+  --cozy-space-6: 2rem;
+  --cozy-space-7: 3rem;
+  --cozy-space-8: 5rem;
+  --cozy-container: 1160px;
+  --cozy-reading-width: 65ch;
+  --cozy-radius-control: 12px;
+  --cozy-radius-card: 24px;
+  --cozy-radius-pill: 99px;
+  --cozy-border-width: 1px;
+  --cozy-focus-width: 3px;
+  --cozy-focus-offset: 4px;
+  --cozy-control-height: 46px;
+  --cozy-shadow-card: 0 12px 35px rgb(90 61 75 / 0.05);
+  --cozy-shadow-soft: 0 8px 30px rgb(90 61 75 / 0.035);
+  --cozy-gradient-warm: linear-gradient(130deg, var(--cozy-soft), var(--cozy-pink) 65%, var(--cozy-cream));
+  --cozy-gradient-fresh: linear-gradient(135deg, var(--cozy-fresh), var(--cozy-cream), var(--cozy-lavender));
+  --cozy-gradient-gentle: linear-gradient(145deg, var(--cozy-soft), var(--cozy-cream) 65%, var(--cozy-fresh));
+  --cozy-duration: 140ms;
+}
+
+/* Rosy ist der Standard, auch ohne/bei ungültigem Attribut. */
+:root {
+  --kat-bg: #FFF8F3;
+  --kat-surface: #FFFCFA;
+  --kat-text: #49383F;
+  --kat-text-muted: #705A62;
+  --kat-primary: #F3A9C2;
+  --cozy-button-hover: #EE98B6;
+  --cozy-strong: #85435E;
+  --cozy-soft: #FBE2EC;
+  --cozy-fresh: #CBECE5;
+  --cozy-lavender: #E7DDF5;
+  --cozy-beige: #EFE2D1;
+  --kat-border-color: #997181;
+}
+
+:root[data-palette="lilac"] {
+  --kat-bg: #FBF8FE;
+  --kat-surface: #FFFDFE;
+  --kat-text: #40374B;
+  --kat-text-muted: #695D76;
+  --kat-primary: #D4C0F0;
+  --cozy-button-hover: #C7ACEA;
+  --cozy-strong: #655080;
+  --cozy-soft: #EEE5F8;
+  --cozy-fresh: #D7EEE8;
+  --cozy-lavender: #E4D7F5;
+  --cozy-beige: #EFE2D1;
+  --kat-border-color: #887398;
+}
+
+:root[data-palette="mint"] {
+  --kat-bg: #F5FBF7;
+  --kat-surface: #FCFFFC;
+  --kat-text: #294741;
+  --kat-text-muted: #4B655E;
+  --kat-primary: #A8DFD1;
+  --cozy-button-hover: #93D4C4;
+  --cozy-strong: #376C62;
+  --cozy-soft: #DCF2EA;
+  --cozy-fresh: #C4EAE2;
+  --cozy-lavender: #E7DDF5;
+  --cozy-beige: #EFE2D1;
+  --kat-border-color: #6A8B82;
+}
+

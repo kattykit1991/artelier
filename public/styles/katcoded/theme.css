@@ -1,0 +1,117 @@
+/* CUTE_COZY v0.1 · kompakte Foundation, keine Komponentenbibliothek. */
+@font-face {
+  font-family: "Quicksand";
+  src: url("fonts/Quicksand.ttf") format("truetype");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Nunito Sans";
+  src: url("fonts/NunitoSans.ttf") format("truetype");
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+body {
+  margin: 0;
+  background: var(--kat-bg);
+  color: var(--kat-text);
+  font: 400 var(--cozy-size-body)/var(--cozy-leading-body) var(--kat-font-body);
+}
+:where(button, input, select, textarea) { font: inherit; }
+:where(h1, h2, h3, h4) {
+  font-family: var(--cozy-font-display);
+  font-weight: 700;
+  line-height: var(--cozy-leading-display);
+  letter-spacing: var(--cozy-tracking-display);
+  margin: 0 0 var(--cozy-space-3);
+}
+h1 { font-size: var(--cozy-size-hero); line-height: var(--cozy-leading-hero); }
+h2 { font-size: var(--cozy-size-h2); }
+h3 { font-size: var(--cozy-size-h3); }
+h4 { font-size: var(--cozy-size-h4); }
+p { margin: 0 0 var(--cozy-space-3); }
+:where(p, h1, h2, h3, h4, a, label) { overflow-wrap: anywhere; }
+a { color: var(--cozy-strong); text-underline-offset: 0.25em; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible {
+  outline: var(--cozy-focus-width) solid var(--kat-focus);
+  outline-offset: var(--cozy-focus-offset);
+}
+.cozy-container { width: min(90%, var(--cozy-container)); margin-inline: auto; }
+.cozy-reading { max-inline-size: var(--cozy-reading-width); font-size: var(--cozy-size-reading); line-height: var(--cozy-leading-reading); }
+.cozy-caption { color: var(--kat-text-muted); font-size: var(--cozy-size-caption); line-height: 1.6; }
+.cozy-card {
+  min-inline-size: 0;
+  padding: var(--cozy-space-6);
+  background: var(--kat-surface);
+  color: var(--kat-text);
+  border: var(--cozy-border-width) solid var(--cozy-beige);
+  border-radius: var(--cozy-radius-card);
+  box-shadow: var(--cozy-shadow-card);
+}
+.cozy-card--gentle { background: var(--cozy-gradient-gentle); }
+.cozy-gradient-warm { background: var(--cozy-gradient-warm); }
+.cozy-gradient-fresh { background: var(--cozy-gradient-fresh); }
+.cozy-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  min-block-size: var(--cozy-control-height);
+  max-inline-size: 100%;
+  padding: var(--cozy-space-2) var(--cozy-space-4);
+  border: var(--cozy-border-width) solid var(--kat-border-color);
+  border-radius: var(--cozy-radius-pill);
+  background: var(--kat-surface);
+  color: var(--kat-text);
+  font: 800 var(--cozy-size-button)/var(--cozy-leading-ui) var(--kat-font-body);
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--cozy-duration);
+}
+/* Sichtbare Auswahl passend zum Variantenwähler der Referenzdemo. */
+.cozy-button[data-cozy-palette][aria-pressed="true"] {
+  background: var(--cozy-soft);
+  border: 2px solid var(--cozy-strong);
+  padding: calc(var(--cozy-space-2) - 1px) calc(var(--cozy-space-4) - 1px);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+/* Hauptakzent als Buttonfläche ist hier eine bewusste Style-Entscheidung. */
+.cozy-button--primary { background: var(--kat-primary); border-color: var(--cozy-strong); }
+.cozy-button--ghost { background: transparent; border-color: transparent; color: var(--cozy-strong); text-decoration: underline; }
+@media (hover: hover) {
+  .cozy-button:not(:disabled):not([aria-disabled="true"]):hover { background: var(--cozy-soft); }
+  .cozy-button--primary:not(:disabled):not([aria-disabled="true"]):hover { background: var(--cozy-button-hover); }
+}
+.cozy-button:not(:disabled):not([aria-disabled="true"]):active { text-decoration: underline; text-decoration-thickness: 2px; }
+.cozy-button:disabled, .cozy-button[aria-disabled="true"] {
+  background: var(--cozy-beige);
+  color: var(--kat-text-muted);
+  border-color: var(--kat-border-color);
+  cursor: not-allowed;
+}
+.cozy-nav { display: flex; flex-wrap: wrap; gap: var(--cozy-space-1) 1.7rem; }
+.cozy-nav a { padding-block: var(--cozy-space-1); color: var(--kat-text); font-size: 0.85rem; font-weight: 700; }
+.cozy-field { display: grid; gap: 0.4rem; min-inline-size: 0; }
+.cozy-field > label { font-size: 0.8rem; font-weight: 800; }
+.cozy-field :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  inline-size: 100%;
+  min-inline-size: 0;
+  border: var(--cozy-border-width) solid var(--kat-border-color);
+  border-radius: var(--cozy-radius-control);
+  padding: 0.7rem 0.9rem;
+  background: var(--kat-surface);
+  color: var(--kat-text);
+  font-size: var(--cozy-size-field);
+}
+.cozy-field textarea { resize: vertical; }
+.cozy-field ::placeholder { color: var(--kat-text-muted); opacity: 1; }
+.cozy-ornament { color: var(--cozy-strong); pointer-events: none; }
+[data-cozy-decor="off"] .cozy-ornament { display: none; }
+@media (max-width: 760px) { .cozy-card { padding: var(--cozy-space-5); } }
+@media (prefers-reduced-motion: reduce) { .cozy-button { transition: none; } }

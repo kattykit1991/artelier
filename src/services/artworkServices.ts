@@ -7,10 +7,15 @@ export async function artworkSearch(query: string) {
     { referrerPolicy: "no-referrer" },
   );
   if (!response.ok) {
-    throw new Error("Something went wrong.");
+    const message = response.status === 429
+      ? "The museum is busy. Please try again in a moment."
+      : `The museum search is unavailable (HTTP ${response.status}). Please try again.`;
+    throw new Error(message);
   }
-  const data = await response.json();
-  const artworks = data.data;
-  const validatedArtworks = z.array(ArtworkSchema).parse(artworks);
+  if (!response.headers.get("content-type")?.includes("application/json")) {
+    throw new Error("The search service returned an unexpected response. Please try again later.");
+  }
+  const data: unknown = await response.json();
+  const validatedArtworks = z.object({ data: z.array(ArtworkSchema) }).parse(data).data;
   return validatedArtworks;
 }

@@ -5,7 +5,9 @@
 
 ---
 
-**Checkpoint · 24.10.2026:** FR003 und FR004 abgeschlossen; Stage 03 / FR005 begonnen. Lokale Safari-Suche mit zehn validierten Kunstwerken von Kat bestätigt, Ergebnisse bisher nur in der Konsole. Vite-Development-Proxy und `no-referrer` eingerichtet; Cloudflare-Pages-Anbindung offen. TypeScript, Lint und Vite-Build im Speicher bestehen. Nächster Schritt: Formular-Submit für Enter und Whooosh, danach Ergebnis-State/-Darstellung. Details und Prüfgrenzen im Requirements-Piloten.
+**Prüfstand · 25.10.2026:** Alle zwölf FRs sind implementiert und lokal geprüft; FR006 behält wegen externer Bildsperren Hinweise. Explore/My Gallery und responsive Gestaltung stehen. TypeScript/Build, Lint und 23 Tests bestehen; Safari- und Pages-Runtime-Prüfungen sind in `PROJECT_REQUIREMENTS.md` dokumentiert. Vor der Präsentation fehlen Freigabe, Deployment und der Smoke-Test auf der echten HTTPS-Domain. Keine abgeschlossenen Lernschritte wiederholen.
+
+**Lokal / Deployment:** `npm run dev` nutzt weiterhin Vite; `npm run build`, `npm run lint`, `npm run test` prüfen den Stand. Den Produktionspfad mit `npx wrangler pages dev dist --port 8788 --compatibility-date 2026-10-25` nach dem Build testen. Für Git-basiertes Pages-Deployment: Build `npm run build`, Ausgabeverzeichnis `dist`, Projektwurzel mit `functions/`. `npm run preview` hat keine Functions. Keine Secrets nötig. Details und verbleibender Live-Test im Savegame.
 
 ## 🧭 BUILD ROUTE
 
@@ -27,7 +29,7 @@ Die React-/TypeScript-Anwendung läuft lokal und Zod ist installiert.
 
 ### 1 · Projektgerüst prüfen (FR001)
 
-- [ ] Artelier mit `kat-create` anlegen.
+- [x] Artelier mit `kat-create` anlegen.
 - [x] Vite mit React und TypeScript im Projekt einrichten.
 - [x] Abhängigkeiten installieren.
 - [x] Entwicklungsserver starten und Anwendung im Browser prüfen.
@@ -84,7 +86,7 @@ Kunstwerkdaten von der API abrufen und mit Zod validieren.
 - [x] Ein Zod-Schema für `id`, `title`, `artist_title` und `image_id` erstellen.
 - [x] Sinnvolle Behandlung fehlender oder leerer Angaben festlegen.
 
-**Festgelegt:** Fehlend/`null` erhält die vereinbarten Ersatzwerte; leere Strings bleiben vorerst erlaubt. Der Bildplatzhalter `No image available.` ist für ArtworkCard geplant und noch nicht umgesetzt.
+**Festgelegt:** Fehlend/`null` erhält die vereinbarten Ersatzwerte; leere Strings bleiben erlaubt. ArtworkCard zeigt bei fehlenden und fehlgeschlagenen Bildern den gestalteten Platzhalter `No image available.`.
 - [x] Den TypeScript-Typ aus dem Schema ableiten.
 
 #### 🧱 DAFÜR BRAUCHST DU
@@ -136,7 +138,7 @@ type Typ = z.infer<typeof Schema>;
 - [x] Eingehende Kunstwerke mit dem Schema prüfen.
 - [x] Ungültige Daten kontrolliert behandeln.
 
-**Checkpoint 24.10.2026:** `fields`, Export, Validierung und FR004-Review sind abgeschlossen. Die lokale Suche ist nach Referer-Korrektur erfolgreich; Fehlerfälle wurden im FR004-Review mit Mocks geprüft. Produktionsanbindung bleibt offen.
+**Abgeschlossen:** `fields`, Export und Validierung bleiben erhalten. Die Pages Function stellt denselben API-Pfad produktiv bereit; lokal im Pages-Runtime und aus Safari ohne Vite-Proxy mit echten Antworten geprüft. Veröffentlichung und Live-Abnahme stehen noch aus.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -190,12 +192,12 @@ Nach Kunstwerken suchen und die Ergebnisse als Karten anzeigen.
 
 ### 1 · Suchoberfläche bauen (FR005)
 
-**Zwischenstand:** Button-Suche funktioniert laut Kat in Safari; Ergebnisse nur in der Konsole. Als Nächstes Enter und Whooosh über `form` / `onSubmit` verbinden. Der kombinierte Punkt „Suche auslösen und Ergebnisse im State speichern“ bleibt bis zum Ergebnis-State offen.
+**Abgeschlossen:** Enter und Whooosh über Formular-Submit, typisierter Ergebnis-State, Kartenliste sowie Lade-/Fehleranzeige vorhanden und lokal geprüft.
 
 - [x] Ein Eingabefeld für den Suchbegriff erstellen.
 - [x] Den Suchbegriff in React-State verwalten.
-- [ ] Die Suche auslösen und Ergebnisse im State speichern.
-- [ ] Lade- und Fehlerzustände sinnvoll anzeigen.
+- [x] Die Suche auslösen und Ergebnisse im State speichern.
+- [x] Lade- und Fehlerzustände sinnvoll anzeigen.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -238,10 +240,10 @@ event.preventDefault();
 
 ### 2 · ArtworkCard bauen (FR006)
 
-- [ ] Eine wiederverwendbare Kartenkomponente erstellen.
-- [ ] Titel, Künstlerangabe und Bild darstellen.
-- [ ] Fehlende Bilddaten sinnvoll behandeln.
-- [ ] Validierte Suchergebnisse als Kartenliste rendern.
+- [x] Eine wiederverwendbare Kartenkomponente erstellen.
+- [x] Titel, Künstlerangabe und Bild darstellen.
+- [x] Fehlende Bilddaten sinnvoll behandeln.
+- [x] Validierte Suchergebnisse als Kartenliste rendern.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -285,8 +287,8 @@ function Card({ eintrag }: Props) {
 ## ✅ FERTIG, WENN
 
 - [x] Ein Suchbegriff eine API-Suche auslöst.
-- [ ] Gültige Ergebnisse als Karten erscheinen.
-- [ ] Fehlende Daten oder Anfragefehler die Oberfläche nicht abstürzen lassen.
+- [x] Gültige Ergebnisse als Karten erscheinen.
+- [x] Fehlende Daten oder Anfragefehler die Oberfläche nicht abstürzen lassen.
 
 ---
 
@@ -300,9 +302,9 @@ Kunstwerke als Favoriten speichern und in einer eigenen Galerie anzeigen.
 
 ### 1 · Galerie-Datenmodell und State (FR007, FR012)
 
-- [ ] Festlegen, welche Daten ein gespeichertes Kunstwerk benötigt.
-- [ ] Einen passend typisierten Galerie-State erstellen.
-- [ ] Die Galerie in der Oberfläche zugänglich machen.
+- [x] Festlegen, welche Daten ein gespeichertes Kunstwerk benötigt.
+- [x] Einen passend typisierten Galerie-State erstellen.
+- [x] Die Galerie in der Oberfläche zugänglich machen.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -326,10 +328,10 @@ setEintraege((vorherige) => [...vorherige, neuerEintrag]);
 
 ### 2 · Favoriten speichern (FR008)
 
-- [ ] Ein Kunstwerk aus den Suchergebnissen zur Galerie hinzufügen.
-- [ ] Doppelte Einträge sinnvoll behandeln.
-- [ ] Die Galerie in `localStorage` speichern.
-- [ ] Gespeicherte Daten beim Start wieder laden und prüfen.
+- [x] Ein Kunstwerk aus den Suchergebnissen zur Galerie hinzufügen.
+- [x] Doppelte Einträge sinnvoll behandeln.
+- [x] Die Galerie in `localStorage` speichern.
+- [x] Gespeicherte Daten beim Start wieder laden und prüfen.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -370,8 +372,8 @@ useEffect(() => {
 
 ### 3 · Galerie anzeigen (FR009)
 
-- [ ] Gespeicherte Kunstwerke in der Galerie rendern.
-- [ ] Einen sinnvollen Leerzustand anzeigen.
+- [x] Gespeicherte Kunstwerke in der Galerie rendern.
+- [x] Einen sinnvollen Leerzustand anzeigen.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -394,9 +396,9 @@ eintraege.length === 0
 
 ## ✅ FERTIG, WENN
 
-- [ ] Kunstwerke zur Galerie hinzugefügt werden können.
-- [ ] Die Galerie nach einem Neuladen erhalten bleibt.
-- [ ] Gespeicherte Kunstwerke in der Galerie sichtbar sind.
+- [x] Kunstwerke zur Galerie hinzugefügt werden können.
+- [x] Die Galerie nach einem Neuladen erhalten bleibt.
+- [x] Gespeicherte Kunstwerke in der Galerie sichtbar sind.
 
 ---
 
@@ -410,10 +412,10 @@ Notizen zu Favoriten bearbeiten, Einträge entfernen und die App abschließend p
 
 ### 1 · Notizen validieren und bearbeiten (FR010)
 
-- [ ] Ein Zod-Schema für Notizen definieren.
-- [ ] Eine Eingabe zum Bearbeiten von Notizen bereitstellen.
-- [ ] Notizen vor dem Speichern validieren.
-- [ ] Änderungen dauerhaft in der Galerie speichern.
+- [x] Ein Zod-Schema für Notizen definieren.
+- [x] Eine Eingabe zum Bearbeiten von Notizen bereitstellen.
+- [x] Notizen vor dem Speichern validieren.
+- [x] Änderungen dauerhaft in der Galerie speichern.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -451,9 +453,9 @@ const aktualisiert = eintraege.map((eintrag) =>
 
 ### 2 · Kunstwerke entfernen (FR011)
 
-- [ ] Einen Entfernen-Button für gespeicherte Kunstwerke ergänzen.
-- [ ] Den betroffenen Eintrag aus dem Galerie-State entfernen.
-- [ ] Prüfen, ob die Änderung in `localStorage` erhalten bleibt.
+- [x] Einen Entfernen-Button für gespeicherte Kunstwerke ergänzen.
+- [x] Den betroffenen Eintrag aus dem Galerie-State entfernen.
+- [x] Prüfen, ob die Änderung in `localStorage` erhalten bleibt.
 
 #### 🧱 DAFÜR BRAUCHST DU
 
@@ -471,8 +473,8 @@ const gefiltert = eintraege.filter((eintrag) => eintrag.id !== id);
 ### 3 · Abschlussprüfung (FR001–FR012)
 
 - [x] Alle zwölf Functional Requirements gegen die Aufgabenstellung prüfen.
-- [ ] Suche, Favoriten, Notizen und Löschen testen.
-- [ ] Seiten-Neuladen und fehlende API-Daten testen.
+- [x] Suche, Favoriten, Notizen und Löschen testen.
+- [x] Seiten-Neuladen und fehlende API-Daten testen.
 - [x] Typ- und Lintermeldungen prüfen.
 - [ ] Die Anwendung für die Präsentation vorbereiten.
 
@@ -490,10 +492,12 @@ Führt das im Projekt konfigurierte Build-Skript aus und zeigt mögliche Build- 
 
 ## ✅ FERTIG, WENN
 
-- [ ] Notizen validiert, bearbeitet und dauerhaft gespeichert werden.
-- [ ] Galerie-Einträge entfernt werden können.
+- [x] Notizen validiert, bearbeitet und dauerhaft gespeichert werden.
+- [x] Galerie-Einträge entfernt werden können.
 - [ ] Alle zwölf Anforderungen funktionieren.
-- [ ] Die App ohne Build-Fehler läuft.
+
+**Abnahme offen:** Implementierung und lokale Prüfungen sind abgeschlossen. Erst nach Deployment Suche, eingebettete Bilder und Galerieablauf auf `artelier.katcoded.de` bestätigen. Bildserver-Sperren bleiben extern; Fallbacks sind geprüft.
+- [x] Die App ohne Build-Fehler läuft.
 
 ---
 
