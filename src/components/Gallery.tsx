@@ -1,6 +1,8 @@
 import type { SavedArtwork } from "../schemas/savedArtworkSchema";
 import ArtworkCard from "./ArtworkCard";
 
+// Die Galerie bekommt gespeicherte Kunstwerke und zwei Funktionen von App.
+// Die Callbacks nehmen ID bzw. ID und Notiz entgegen; void heißt: kein Rückgabewert nötig.
 type GalleryProps = {
   artworks: SavedArtwork[];
   onRemove: (id: number) => void;
@@ -8,6 +10,7 @@ type GalleryProps = {
 };
 
 export default function Gallery({ artworks, onRemove, onUpdateNote }: GalleryProps) {
+  // Der gemeinsame State lebt in App. Hier zeigen wir ihn an und melden Benutzeraktionen zurück.
   return (
     <section aria-labelledby="gallery-heading">
       <div className="section-heading">
@@ -18,6 +21,7 @@ export default function Gallery({ artworks, onRemove, onUpdateNote }: GalleryPro
         <p>Keep the art. Add your perspective.</p>
       </div>
 
+      {/* Noch nichts gesammelt? Dann gibt es eine Einladung statt einer leeren Wand. */}
       {artworks.length === 0 && (
         <div className="empty-state">
           <span className="empty-symbol cozy-ornament" aria-hidden="true">◇</span>
@@ -27,10 +31,13 @@ export default function Gallery({ artworks, onRemove, onUpdateNote }: GalleryPro
       )}
 
       <div className="artwork-grid">
+        {/* map macht aus jedem Eintrag eine Karte. Die ID ist Reacts stabiler key. */}
         {artworks.map((artwork) => (
           <ArtworkCard key={artwork.id} artwork={artwork}>
             <div className="cozy-field">
             <label className="note-label" htmlFor={`note-${artwork.id}`}>Personal note</label>
+            {/* value kommt aus dem State. Jede Änderung geht zur Zod-Prüfung in App
+                und dann über den Galerie-Effect auch in localStorage. */}
             <textarea
               id={`note-${artwork.id}`}
               value={artwork.note}
